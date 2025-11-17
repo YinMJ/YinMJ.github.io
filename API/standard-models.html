@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标准模型API - RunningHub</title>
+    <link rel="stylesheet" href="standard-models-fixed.css?v=20251038">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="standard-models-page">
+    <!-- 顶部导航栏 -->
+    <header class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <span class="logo-icon">R</span> RunningHUB
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="dropdown-wrapper">
+                    <button class="nav-btn primary dropdown-btn" data-dropdown="sdk">
+                        其他SDK下载
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="sdk-dropdown">
+                        <a href="https://github.com/HM-RunningHub" target="_blank" class="dropdown-item">Github</a>
+                        <a href="https://github.com/HM-RunningHub/RH_CozeSDK" target="_blank" class="dropdown-item">Coze SDK</a>
+                        <a href="https://github.com/HM-RunningHub/ComfyUI_RH_APICall" target="_blank" class="dropdown-item">ComfyUI插件</a>
+                        <a href="https://github.com/zombieyang/sd-ppp" target="_blank" class="dropdown-item">SD-PPP</a>
+                    </div>
+                </div>
+                <button class="nav-btn primary">
+                    进入控制台
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div class="header-icons">
+                    <button class="nav-btn" title="联系">
+                        <i class="fas fa-headset"></i>
+                    </button>
+                    <button class="nav-btn" title="通知">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="nav-btn" title="黄钻">
+                        <i class="fas fa-gem"></i>
+                    </button>
+                    <button class="nav-btn" title="用户中心">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- Hero区域 -->
+        <section class="hero-section">
+            <div class="hero-background">
+                <div class="hero-content">
+                    <div class="model-tag">image-to-video</div>
+                    <h1 class="model-name">Kling Video</h1>
+                    <p class="model-description">
+                        Kling 2.5 Turbo Pro: Top-tier image-to-video generation with unparalleled motion fluidity, cinematic visuals, and exceptional prompt precision.
+                    </p>
+                    <div class="hero-actions">
+                        <button class="btn-try">立即试用!</button>
+                        <button class="btn-docs">API文档</button>
+                    </div>
+                    <div class="model-tabs">
+                        <button class="model-tab active" data-model="nano-banana">Nano Banana</button>
+                        <button class="model-tab" data-model="veo-3-1">Veo 3.1</button>
+                        <button class="model-tab" data-model="sora-2">Sora 2</button>
+                        <button class="model-tab" data-model="wan-2-5">Wan 2.5</button>
+                        <button class="model-tab" data-model="kling-video">Kling Video</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 标题区域 -->
+        <section class="title-section">
+            <div class="container">
+                <div class="title-content">
+                    <div class="intro-block">
+                        <h2 class="intro-title">标准模型API</h2>
+                        <p class="description">
+                            标准模型API提供预训练模型的基础能力调用，即调即用。涵盖图像生成、文本生成、语音识别、视频生成等多种AI能力，支持灵活的算力分配和扩展，计费方式清晰透明，帮助开发者快速集成AI功能到自己的应用中。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 搜索区域 -->
+        <section class="search-section">
+            <div class="container">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="按模型、任务、类别等进行搜索" id="searchInput">
+                        <button class="btn-view-all" id="viewAllBtn">查看所有标准模型API</button>
+                    </div>
+                    <div class="search-suggestions">
+                        <span class="suggest-label">Try:</span>
+                        <button class="suggestion-tag">Newest image to video models</button>
+                        <button class="suggestion-tag">Flux Kontext</button>
+                        <button class="suggestion-tag">Generate 3D model</button>
+                        <button class="suggestion-tag">Create music</button>
+                        <button class="suggestion-tag">Remove background</button>
+                        <button class="suggestion-tag">Upscale</button>
+                        <button class="suggestion-tag">Training</button>
+                        <button class="suggestion-tag">Try on clothing</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心内容区域 -->
+        <section class="content-section">
+            <div class="container">
+                <!-- 最近上新 -->
+                <div class="category-section">
+                    <div class="category-header">
+                        <button class="category-title-btn" data-category="最近上新">
+                            <span>最近上新</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="carousel-controls">
+                        <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="models-grid">
+                        <!-- 模型卡片将通过 JavaScript 动态加载 -->
+                    </div>
+                </div>
+
+                <!-- 最佳图像编辑模型 -->
+                <div class="category-section">
+                    <div class="category-header">
+                        <button class="category-title-btn" data-category="最佳图像编辑模型">
+                            <span>最佳图像编辑模型</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="carousel-controls">
+                        <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="models-grid">
+                        <!-- 模型卡片将通过 JavaScript 动态加载 -->
+                    </div>
+                </div>
+
+                <!-- Veo 3.1 -->
+                <div class="category-section">
+                    <div class="category-header">
+                        <button class="category-title-btn" data-category="Veo 3.1">
+                            <span>Veo 3.1</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="carousel-controls">
+                        <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="models-grid">
+                        <!-- 模型卡片将通过 JavaScript 动态加载 -->
+                    </div>
+                </div>
+
+                <!-- Sora 2 -->
+                <div class="category-section">
+                    <div class="category-header">
+                        <button class="category-title-btn" data-category="Sora 2">
+                            <span>Sora 2</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="carousel-controls">
+                        <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="models-grid">
+                        <!-- 模型卡片将通过 JavaScript 动态加载 -->
+                    </div>
+                </div>
+
+                <!-- Wan -->
+                <div class="category-section">
+                    <div class="category-header">
+                        <button class="category-title-btn" data-category="Wan">
+                            <span>Wan</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="carousel-controls">
+                        <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="models-grid">
+                        <!-- 模型卡片将通过 JavaScript 动态加载 -->
+                    </div>
+                </div>
+
+                <!-- 音频模型 -->
+                <div class="category-section">
+                    <div class="category-header">
+                        <button class="category-title-btn" data-category="音频模型">
+                            <span>音频模型</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="carousel-controls">
+                        <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="models-grid">
+                        <!-- 模型卡片将通过 JavaScript 动态加载 -->
+                    </div>
+                </div>
+
+                <!-- 临时保留原有卡片作为备用 -->
+                <div style="display: none;">
+                    <div class="model-card">
+                        <div class="card-image">
+                            <button class="favorite-btn"><i class="fas fa-star"></i></button>
+                        </div>
+                        <div class="card-content">
+                            <h4 class="api-name">Remove.bg Pro</h4>
+                                <div class="category-tag">背景移除</div>
+                                <p class="description">专业级背景移除和图像处理</p>
+                                <div class="stats">
+                                    <span class="run-count">运行次数: 6.8M</span>
+                                    <span class="price">¥0.03/次</span>
+                                </div>
+                                <div class="source">来源: 官方</div>
+                            </div>
+                        </div>
+                        <div class="model-card">
+                            <div class="card-image">
+                                <div class="free-tag">每日限免5次</div>
+                                <button class="favorite-btn"><i class="fas fa-star"></i></button>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="api-name">Upscale AI</h4>
+                                <div class="category-tag">图像增强</div>
+                                <p class="description">AI驱动的图像超分辨率技术</p>
+                                <div class="stats">
+                                    <span class="run-count">运行次数: 2.3M</span>
+                                    <span class="price">¥0.07/次</span>
+                                </div>
+                                <div class="source">来源: 渠道</div>
+                            </div>
+                        </div>
+                        <div class="model-card">
+                            <div class="card-image">
+                                <button class="favorite-btn"><i class="fas fa-star"></i></button>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="api-name">Face Swap Pro</h4>
+                                <div class="category-tag">人脸替换</div>
+                                <p class="description">高质量人脸替换和编辑工具</p>
+                                <div class="stats">
+                                    <span class="run-count">运行次数: 1.8M</span>
+                                    <span class="price">¥0.25/次</span>
+                                </div>
+                                <div class="source">来源: 渠道</div>
+                            </div>
+                        </div>
+                        <div class="model-card">
+                            <div class="card-image">
+                                <button class="favorite-btn"><i class="fas fa-star"></i></button>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="api-name">Style Transfer</h4>
+                                <div class="category-tag">风格迁移</div>
+                                <p class="description">艺术风格迁移和图像风格化</p>
+                                <div class="stats">
+                                    <span class="run-count">运行次数: 1.1M</span>
+                                    <span class="price">¥0.09/次</span>
+                                </div>
+                                <div class="source">来源: 官方</div>
+                            </div>
+                        </div>
+                        <div class="model-card">
+                            <div class="card-image">
+                                <button class="favorite-btn"><i class="fas fa-star"></i></button>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="api-name">Colorize AI</h4>
+                                <div class="category-tag">图像上色</div>
+                                <p class="description">黑白照片智能上色技术</p>
+                                <div class="stats">
+                                    <span class="run-count">运行次数: 950K</span>
+                                    <span class="price">¥0.05/次</span>
+                                </div>
+                                <div class="source">来源: 渠道</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- API对比弹窗 -->
+    <div class="modal" id="comparisonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>API KEY类型及权益对比</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 第一部分：平台API类型 -->
+                <div class="api-types-section">
+                    <h4 class="section-title">API KEY 类型</h4>
+                    <div class="api-type-cards">
+                        <div class="api-type-card card-member">
+                            <h5>消费级-会员API</h5>
+                            <p>该API适合个人和小团队使用。基础版支持1并发，专业版支持3并发，专业Plus版支持5并发。基于强大的ComfyUI环境，支持7*24小时稳定运行和高效工作流，满足小规模创作需求。</p>
+                            <button class="card-btn btn-blue">去开通</button>
+                        </div>
+                        <div class="api-type-card card-shared">
+                            <h5>企业级-共享API</h5>
+                            <p>该共享API基于RH公共资源池，提供弹性调用服务，默认并发为50，按实际使用计费。用户可以灵活调用各类工作流，按需扩展调用规模。适合日常业务接入、批量处理、阶段性增长等场景，平衡灵活性与成本效益。</p>
+                            <button class="card-btn btn-orange">去充值</button>
+                        </div>
+                        <div class="api-type-card card-exclusive">
+                            <h5>企业级-独占API</h5>
+                            <p>该独占API为性能敏感或大规模生产环境提供专用计算资源。通过独立租用GPU算力，用户可以享受固定并发和稳定响应速度。特别适合对高并发、低延迟、稳定性要求严格的核心业务场景。</p>
+                            <button class="card-btn btn-orange">去开通</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二部分：平台API权益对比 -->
+                <div class="api-comparison-section">
+                    <h4 class="section-title">API KEY 权益对比</h4>
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>消费级-会员API</th>
+                                    <th>企业级-共享API</th>
+                                    <th>企业级-独占API</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>适用场景</strong></td>
+                                    <td>个人或团队内部使用</td>
+                                    <td>商业场景灵活调用，按需使用</td>
+                                    <td>高并发生产、性能敏感场景</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GPU 资源池</strong></td>
+                                    <td>共享资源池</td>
+                                    <td>共享资源池</td>
+                                    <td>独占资源池</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GPU 类型</strong></td>
+                                    <td>90系列 24G/48G</td>
+                                    <td>90系列 24G/48G</td>
+                                    <td>90系列 24G/48G</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>充值模式</strong></td>
+                                    <td>会员套餐</td>
+                                    <td>钱包预充值</td>
+                                    <td>独占套餐</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>计费模式</strong></td>
+                                    <td>会员权益，消耗RH币</td>
+                                    <td>消耗钱包余额，按运行时长计费</td>
+                                    <td>周期性租用，不限调用次数</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>定价</strong></td>
+                                    <td>同会员套餐</td>
+                                    <td>模型创作和快捷创作（专用GPU）¥2.5/小时，按秒计费；标准运行（90系列 24G）¥4/小时，按秒计费；Plus运行（90系列 48G）¥6/小时，按秒计费。注：多并发任务时，成本按累计运行时长计算，不使用不收费</td>
+                                    <td>独占（90系列 24G显存）¥1500/路/月；独占Plus（90系列 48G显存）¥2250/路/月</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>API 并发数</strong></td>
+                                    <td>同会员权益</td>
+                                    <td>默认50，提升并发请联系：jason@runninghub.ai</td>
+                                    <td>任务并发数等于购买的GPU数量</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>高速队列</strong></td>
+                                    <td>会员高速队列</td>
+                                    <td>企业级高速队列</td>
+                                    <td>企业级高速队列</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>主要优势</strong></td>
+                                    <td>个人使用高性价比</td>
+                                    <td>弹性灵活高并发商业场景</td>
+                                    <td>独占算力，累积缓存，运行速度快且稳定</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>页面任务权益</strong></td>
+                                    <td>同会员权益</td>
+                                    <td>无</td>
+                                    <td>见独占套餐产品说明</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>并存关系</strong></td>
+                                    <td>可同时开启共享API</td>
+                                    <td>可同时开启会员或独占API</td>
+                                    <td>可同时开启共享API</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>缓存说明</strong></td>
+                                    <td colspan="3">
+                                        <div style="line-height: 1.8;">
+                                            存在缓存时，任务运行时长将大幅减少<br><br>
+                                            共享资源池：任务在资源池内调度；如调度到不同机器，可能出现无缓存运行，导致运行时长增加<br><br>
+                                            独占资源池：相同工作流连续运行时，缓存状态会保持；一旦切换工作流，缓存将被清空。如需始终保持缓存，当前可通过多个账号绑定独立工作流实现
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-data.js"></script>
+    <script src="standard-models.js"></script>
+</body>
+</html>

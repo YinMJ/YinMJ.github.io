@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComfyUI工作流分类 - RunningHub</title>
+    <link rel="stylesheet" href="standard-models-fixed.css?v=20251039">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* CSS变量定义 */
+        :root {
+            --rh-bg: #f5f5f7;
+            --rh-surface: #ffffff;
+            --rh-surface-2: #fafafa;
+            --rh-border: #e5e5e7;
+            --rh-text: #1d1d1f;
+            --rh-muted: #6e6e73;
+            --rh-primary: #007aff;
+            --rh-primary-600: #0051d5;
+            --rh-accent: #5ac8fa;
+            --rh-success: #34c759;
+        }
+        
+        /* 分类详情页面特定样式 */
+        .comfyui-workflows-category-page {
+            min-height: 100vh;
+            background: var(--rh-bg);
+            padding-top: 60px;
+        }
+
+        .page-header {
+            background: var(--rh-surface);
+            border-bottom: 0.5px solid var(--rh-border);
+            padding: 24px 0;
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+            margin-top: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--rh-primary);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 122, 255, 0.08);
+        }
+
+        .back-btn i {
+            font-size: 14px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--rh-text);
+            letter-spacing: -0.003em;
+            margin: 0;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 4px;
+        }
+
+        .category-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 40px 80px;
+            margin-top: 0;
+        }
+
+        .models-grid-full {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        @media (min-width: 1600px) {
+            .models-grid-full {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1200px) and (max-width: 1599px) {
+            .models-grid-full {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 1199px) and (min-width: 768px) {
+            .models-grid-full {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .models-grid-full {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 16px;
+            }
+        }
+        
+        /* 卡片样式 */
+        .comfyui-workflows-category-page .model-card {
+            background: var(--rh-surface) !important;
+            border: 0.5px solid var(--rh-border) !important;
+            border-radius: 16px !important;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .comfyui-workflows-category-page .model-card:hover {
+            transform: translateY(-4px) !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+            border-color: var(--rh-primary) !important;
+        }
+
+        .comfyui-workflows-category-page .card-image {
+            width: 100% !important;
+            aspect-ratio: 16 / 9 !important;
+            background: linear-gradient(135deg, #f5f5f7 0%, #e5e5e7 100%) !important;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--rh-muted);
+            font-size: 14px;
+            overflow: hidden;
+            height: auto !important;
+        }
+
+        .comfyui-workflows-category-page .favorite-btn {
+            position: absolute !important;
+            top: 8px !important;
+            right: 8px !important;
+            background: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 0.5px solid var(--rh-border) !important;
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--rh-muted) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+            z-index: 2 !important;
+        }
+
+        .comfyui-workflows-category-page .favorite-btn:hover,
+        .comfyui-workflows-category-page .favorite-btn.active {
+            background: #ff6b6b !important;
+            color: white !important;
+        }
+
+        .comfyui-workflows-category-page .card-content {
+            padding: 18px !important;
+        }
+
+        .comfyui-workflows-category-page .api-name {
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            color: var(--rh-text) !important;
+            margin-bottom: 8px !important;
+            line-height: 1.4 !important;
+            display: -webkit-box;
+            -webkit-line-clamp: 2 !important;
+            line-clamp: 2 !important;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .comfyui-workflows-category-page .category-tag {
+            display: inline-block !important;
+            background: rgba(0, 122, 255, 0.1) !important;
+            color: var(--rh-primary) !important;
+            padding: 4px 10px !important;
+            border-radius: 12px !important;
+            font-size: 11px !important;
+            font-weight: 500 !important;
+            margin-bottom: 10px !important;
+        }
+
+        .comfyui-workflows-category-page .description {
+            font-size: 13px !important;
+            color: var(--rh-muted) !important;
+            line-height: 1.5 !important;
+            margin-bottom: 14px !important;
+            display: -webkit-box;
+            -webkit-line-clamp: 2 !important;
+            line-clamp: 2 !important;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .comfyui-workflows-category-page .price-row {
+            margin: 12px 0 !important;
+            padding: 0 !important;
+            font-size: 13px !important;
+            line-height: 1.6 !important;
+            color: var(--rh-text) !important;
+        }
+
+        .comfyui-workflows-category-page .price-row .price {
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #10b981 !important;
+        }
+
+        .comfyui-workflows-category-page .footer-info {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-top: 12px !important;
+            padding-top: 12px !important;
+            border-top: 0.5px solid var(--rh-border) !important;
+            font-size: 12px !important;
+        }
+
+        .comfyui-workflows-category-page .run-count {
+            color: #ff3b30 !important;
+            font-weight: 500 !important;
+        }
+
+        .comfyui-workflows-category-page .source {
+            color: var(--rh-muted) !important;
+            font-weight: 400 !important;
+        }
+    </style>
+</head>
+<body class="standard-models-page comfyui-workflows-category-page">
+    <!-- 顶部导航栏 -->
+    <header class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <span class="logo-icon">R</span> RunningHUB
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="dropdown-wrapper">
+                    <button class="nav-btn primary dropdown-btn" data-dropdown="sdk">
+                        其他SDK下载
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="sdk-dropdown">
+                        <a href="https://github.com/HM-RunningHub" target="_blank" class="dropdown-item">Github</a>
+                        <a href="https://github.com/HM-RunningHub/RH_CozeSDK" target="_blank" class="dropdown-item">Coze SDK</a>
+                        <a href="https://github.com/HM-RunningHub/ComfyUI_RH_APICall" target="_blank" class="dropdown-item">ComfyUI插件</a>
+                        <a href="https://github.com/zombieyang/sd-ppp" target="_blank" class="dropdown-item">SD-PPP</a>
+                    </div>
+                </div>
+                <button class="nav-btn primary">
+                    进入控制台
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div class="header-icons">
+                    <button class="nav-btn" title="联系">
+                        <i class="fas fa-headset"></i>
+                    </button>
+                    <button class="nav-btn" title="通知">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="nav-btn" title="黄钻">
+                        <i class="fas fa-gem"></i>
+                    </button>
+                    <button class="nav-btn" title="用户中心">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面标题栏 -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-chevron-left"></i>
+                <span>返回</span>
+            </button>
+            <h1 class="page-title" id="pageTitle">ComfyUI工作流分类</h1>
+        </div>
+    </div>
+
+    <!-- 核心内容区域 -->
+    <div class="category-content">
+        <div class="models-grid-full" id="modelsGrid">
+            <!-- 模型卡片将通过 JavaScript 动态加载 -->
+        </div>
+    </div>
+
+    <script src="api-data.js"></script>
+    <script src="standard-models.js"></script>
+    <script>
+        // 格式化数字
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // 判断工作流类型（是否为三方模型API）
+        function isThirdPartyWorkflow(workflow) {
+            // 优先使用 modelType 字段
+            if (workflow.modelType === 'thirdParty') {
+                return true;
+            }
+            if (workflow.modelType === 'own') {
+                return false;
+            }
+            // 如果没有 modelType 字段，根据来源判断
+            if (workflow.source && workflow.source.channelName) {
+                const channelName = workflow.source.channelName;
+                return channelName === '三方' || 
+                       channelName === '第三方' ||
+                       channelName === 'OpenAI' ||
+                       channelName === 'Anthropic';
+            }
+            return false;
+        }
+
+        // 创建模型卡片HTML
+        function createWorkflowCard(workflow, index) {
+            // 根据工作流类型设置价格描述
+            const isThirdParty = isThirdPartyWorkflow(workflow);
+            const priceDisplay = isThirdParty 
+                ? '三方API调用费用+运行时长消耗费用'
+                : '运行时长消耗费用';
+            const runCountFormatted = formatNumber(workflow.runCount || 0);
+            
+            return `
+                <div class="model-card" data-api-id="${index}" style="cursor: pointer;">
+                    <div class="card-image">
+                        <button class="favorite-btn"><i class="fas fa-star"></i></button>
+                    </div>
+                    <div class="card-content">
+                        <h4 class="api-name">${workflow.name}</h4>
+                        <div class="category-tag">${workflow.taskType || '未知'}</div>
+                        <p class="description">${workflow.description || '暂无描述'}</p>
+                        <div class="price-row">${priceDisplay}</div>
+                        <div class="footer-info">
+                            <span class="run-count">${runCountFormatted} runs</span>
+                            <span class="source">${workflow.source.channelName}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 加载分类模型
+        function loadCategoryModels() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category') || '最近上新';
+            
+            // 更新页面标题
+            const titleElement = document.getElementById('pageTitle');
+            if (titleElement) {
+                titleElement.textContent = category;
+            }
+            
+            // 等待数据加载
+            function tryLoad() {
+                if (!window._allApisData || window._allApisData.length === 0) {
+                    setTimeout(tryLoad, 200);
+                    return;
+                }
+
+                // 从全局数据中筛选该分类的模型
+                // 这里可以根据实际分类逻辑进行筛选
+                const categoryModels = window._allApisData
+                    .filter(api => {
+                        // 暂时显示所有模型，实际应根据分类进行筛选
+                        return true;
+                    })
+                    .slice(0, 20); // 限制显示数量
+                
+                const modelsGrid = document.getElementById('modelsGrid');
+                
+                if (modelsGrid && categoryModels.length > 0) {
+                    modelsGrid.innerHTML = categoryModels.map((api, index) => 
+                        createWorkflowCard({
+                            name: api.name,
+                            taskType: api.taskType,
+                            description: api.description,
+                            runCount: api.runCount,
+                            source: api.source
+                        }, `workflow-${index}`)
+                    ).join('');
+                    
+                    // 添加卡片点击事件
+                    addCardClickEvents();
+                }
+            }
+            
+            tryLoad();
+        }
+
+        // 添加卡片点击事件
+        function addCardClickEvents() {
+            const cards = document.querySelectorAll('.model-card');
+            cards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // 如果点击的是收藏按钮，不跳转
+                    if (e.target.closest('.favorite-btn')) {
+                        e.stopPropagation();
+                        const btn = e.target.closest('.favorite-btn');
+                        btn.classList.toggle('active');
+                        return;
+                    }
+                    
+                    // 跳转到工作流详情页（新窗口）
+                    const apiId = this.getAttribute('data-api-id');
+                    const modelName = this.querySelector('.api-name')?.textContent;
+                    if (apiId && modelName) {
+                        window.open(`comfyui-workflows-model-detail.html?name=${encodeURIComponent(modelName)}&id=${encodeURIComponent(apiId)}`, '_blank');
+                    }
+                });
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategoryModels();
+            
+            // 返回按钮点击事件
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) {
+                backBtn.addEventListener('click', function() {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        window.location.href = 'comfyui-workflows-detail.html';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

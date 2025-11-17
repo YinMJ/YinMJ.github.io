@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI应用 - RunningHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #1a1a1a;
+            color: #1d1d1f;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 背景图片 */
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('./ai-applications-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            z-index: -1;
+        }
+        
+        /* 备用背景（如果图片加载失败时显示） */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            z-index: -2;
+        }
+        
+        /* 背景遮罩层，确保前景内容可见 */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2); /* 半透明遮罩，确保卡片可见 */
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 主要内容区域 - 全屏覆盖 */
+        .main-content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none; /* 让背景可以正常显示 */
+        }
+
+        /* 透明按钮容器 */
+        .transparent-buttons-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto; /* 允许按钮接收点击事件 */
+        }
+
+        /* 透明可点击按钮 - 覆盖背景图片底部三分之一区域（包含所有卡片） */
+        .transparent-button {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 33.33%; /* 覆盖底部三分之一区域 */
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+            outline: none;
+        }
+
+        .transparent-button:hover {
+            background: rgba(0, 122, 255, 0.05);
+        }
+
+        .transparent-button:active {
+            background: rgba(0, 122, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景图片层 -->
+    <div class="background-image"></div>
+    
+    <!-- 背景遮罩层 -->
+    <div class="background-overlay"></div>
+
+    <!-- 主要内容区域 - 透明按钮覆盖层 -->
+    <div class="main-content">
+        <div class="transparent-buttons-container">
+            <!-- 单个透明按钮 - 覆盖底部三分之一区域（包含所有5个卡片） -->
+            <button class="transparent-button" data-url="ai-detail.html" title="点击查看AI应用详情"></button>
+        </div>
+    </div>
+
+    <script>
+        // 检查背景图片是否加载成功
+        window.addEventListener('load', function() {
+            const bgImage = document.querySelector('.background-image');
+            if (bgImage) {
+                const img = new Image();
+                img.onload = function() {
+                    console.log('背景图片加载成功');
+                };
+                img.onerror = function() {
+                    console.error('背景图片加载失败，请检查文件路径：ai-applications-background.jpg');
+                    // 如果图片加载失败，显示备用背景
+                    bgImage.style.backgroundImage = 'none';
+                };
+                img.src = './ai-applications-background.jpg';
+            }
+        });
+        
+        // 为所有透明按钮添加点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.transparent-button');
+            
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const url = this.getAttribute('data-url');
+                    if (url) {
+                        window.open(url, '_blank');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

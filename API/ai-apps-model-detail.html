@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI应用模型详情 - RunningHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="model-detail.css?v=20251050">
+</head>
+<body class="model-detail-page">
+    <!-- 顶部导航 -->
+    <header class="detail-header">
+        <div class="container">
+            <div class="brand">
+                <span class="logo-icon">R</span>
+                <span class="brand-name">RunningHUB</span>
+            </div>
+            <div class="header-actions">
+                <div class="dropdown-wrapper">
+                    <button class="btn small dropdown-btn" data-dropdown="sdk">
+                        其他SDK下载
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="sdk-dropdown">
+                        <a href="https://github.com/HM-RunningHub" target="_blank" class="dropdown-item">Github</a>
+                        <a href="https://github.com/HM-RunningHub/RH_CozeSDK" target="_blank" class="dropdown-item">Coze SDK</a>
+                        <a href="https://github.com/HM-RunningHub/ComfyUI_RH_APICall" target="_blank" class="dropdown-item">ComfyUI插件</a>
+                        <a href="https://github.com/zombieyang/sd-ppp" target="_blank" class="dropdown-item">SD-PPP</a>
+                    </div>
+                </div>
+                <div class="dropdown-wrapper">
+                    <button class="btn small dropdown-btn" data-dropdown="docs">
+                        文档中心
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="docs-dropdown">
+                        <a href="https://s.apifox.cn/b860476a-b4d0-4aa5-91b8-6dcaa18d6c7d" target="_blank" class="dropdown-item">API文档</a>
+                        <a href="https://runninghub.feishu.cn/wiki/PdmcwScGMiXiuWk5PqhcD7LznYr" target="_blank" class="dropdown-item">三方API调用说明</a>
+                    </div>
+                </div>
+                <button class="btn primary small">
+                    进入控制台
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div class="header-icons">
+                    <button class="detail-nav-btn" title="联系">
+                        <i class="fas fa-headset"></i>
+                    </button>
+                    <button class="detail-nav-btn" title="通知">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="detail-nav-btn" title="黄钻">
+                        <i class="fas fa-gem"></i>
+                    </button>
+                    <button class="detail-nav-btn" title="用户中心">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 面包屑与标题 -->
+    <section class="detail-hero">
+        <div class="container hero-inner">
+            <div class="hero-content-wrapper">
+                <!-- 左边部分 -->
+                <div class="hero-left">
+                    <!-- 第一行：标题 + 复制按钮 -->
+                    <div class="model-title-row">
+                        <h1 id="modelTitle" class="model-title">模型名称</h1>
+                        <button class="icon-btn copy-btn" id="copyModelNameBtn" title="复制模型名称">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <!-- 第二行：模型简介 -->
+                    <p class="model-description" id="modelDescription">模型简介</p>
+                    <!-- 第三行：标签 -->
+                    <div class="model-tag-row" id="modelTagRow">
+                        <span class="model-tag" id="thirdPartyTag" style="display: none;">三方模型API</span>
+                        <span class="model-tag" id="ownModelTag">自有模型API</span>
+                    </div>
+                    <!-- 第四行：运行数、喜欢数、收藏数 -->
+                    <div class="model-stats-row">
+                        <span class="stat-item">
+                            <i class="fas fa-play-circle"></i>
+                            <span id="runCountDisplay">0</span>
+                        </span>
+                        <span class="stat-item">
+                            <i class="fas fa-heart"></i>
+                            <span id="likeCountDisplay">0</span>
+                        </span>
+                        <span class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span id="favoriteCountDisplay">0</span>
+                        </span>
+                    </div>
+                    <!-- 第五行：API、Playground导航按钮 -->
+                    <div class="hero-tabs">
+                        <button class="tab active" data-target="#apiPane">API</button>
+                        <button class="tab" data-target="#playgroundPane" data-link="playground">Playground</button>
+                    </div>
+                </div>
+
+                <!-- 右边部分：API KEY对比表格 -->
+                <div class="hero-right">
+                    <div class="api-key-table-wrapper">
+                        <h3 class="table-title">价格和权益</h3>
+                        <!-- 表格1：同时显示三方模型API和自有模型API -->
+                        <table class="api-key-table" id="bothModelTable" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>消费级-会员API KEY</th>
+                                    <th>企业级-共享API KEY</th>
+                                    <th>企业级-独占API KEY</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>三方API调用费用</strong></td>
+                                    <td id="bothThirdPartyPrice1">¥XX/次</td>
+                                    <td id="bothThirdPartyPrice2">¥XX/次</td>
+                                    <td id="bothThirdPartyPrice3">¥XX/次</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>运行时长消耗费用</strong></td>
+                                    <td>标准任务（24G显存）：每秒消耗0.2个RH币；<br>Plus任务（48G显存）：每秒消耗0.4个RH币</td>
+                                    <td>标准运行（24G）￥4/小时，按秒计费；<br>Plus运行（48G）￥6/小时，按秒计费</td>
+                                    <td>租期内免费</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>计费模式</strong></td>
+                                    <td>三方API调用费用，消耗钱包余额；<br>运行时长消耗费用，消耗RH币</td>
+                                    <td>三方API调用费用+运行时长消耗费用，消耗钱包余额</td>
+                                    <td>三方API调用费用，消耗钱包余额</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>API并发数</strong></td>
+                                    <td>基础版会员：1；基础版Plus会员：1；专业版会员：3；专业版Plus会员：5</td>
+                                    <td>默认50，<br>如需扩大并发数请联系：jason@runninghub.ai</td>
+                                    <td>任务并发数等同于购买GPU数量</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- 表格2：只显示自有模型API -->
+                        <table class="api-key-table" id="ownModelOnlyTable">
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>消费级-会员API KEY</th>
+                                    <th>企业级-共享API KEY</th>
+                                    <th>企业级-独占API KEY</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>运行时长消耗费用</strong></td>
+                                    <td>标准任务（24G显存）：每秒消耗0.2个RH币；<br>Plus任务（48G显存）：每秒消耗0.4个RH币</td>
+                                    <td>标准运行（24G）￥4/小时，按秒计费；<br>Plus运行（48G）￥6/小时，按秒计费</td>
+                                    <td>租期内免费</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>计费模式</strong></td>
+                                    <td>消耗RH币</td>
+                                    <td>消耗钱包余额</td>
+                                    <td>租期内免费</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>API并发数</strong></td>
+                                    <td>基础版会员：1；基础版Plus会员：1；专业版会员：3；专业版Plus会员：5</td>
+                                    <td>默认50，<br>如需扩大并发数请联系：jason@runninghub.ai</td>
+                                    <td>任务并发数等同于购买GPU数量</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- 更多内容链接 -->
+                        <div class="comparison-link-wrapper">
+                            <span class="comparison-text">更多内容见</span>
+                            <button class="comparison-btn" id="comparisonLinkBtn">API KEY类型及权益对比</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主体内容：三个面板同页切换 -->
+    <main class="detail-main container">
+        <!-- API 文档 -->
+        <section id="apiPane" class="pane active" aria-labelledby="API">
+            <div class="api-layout">
+                <aside class="api-nav">
+                    <div class="nav-cap">目录</div>
+                    <ul>
+                        <li class="active">1. 调用API</li>
+                        <li>2. 身份验证</li>
+                        <li>3. 队列</li>
+                        <li>4. 文件</li>
+                        <li>5. 数据结构</li>
+                    </ul>
+                </aside>
+                <div class="api-content">
+                    <article class="doc-block">
+                        <h3>About</h3>
+                        <p id="aboutText">基于AI应用的示例说明。</p>
+                    </article>
+                    <article class="doc-block">
+                        <h3>1. 调用 API（JavaScript / Node.js）</h3>
+<pre class="code"><code id="codeSample">npm install --save @fal-ai/client
+
+import { fal } from "@fal-ai/client";
+
+const result = await fal.subscribe("ai-app-endpoint", {
+  input: {
+    prompt: "您的输入内容",
+    params: "default"
+  },
+  logs: true,
+  onQueueUpdate: (update) => {
+    if (update.status === "IN_PROGRESS") {
+      update.logs.map(l => l.message).forEach(console.log);
+    }
+  },
+});
+console.log(result.data);
+console.log(result.requestId);</code></pre>
+                        <p>更多详情参考官方文档。</p>
+                    </article>
+                    <article class="doc-block">
+                        <h3>2. 队列与文件</h3>
+<pre class="code"><code>// 提交到队列
+import { fal } from "@fal-ai/client";
+const { request_id } = await fal.queue.submit("ai-app-endpoint", { input: {/* 同上 */} });
+
+// 轮询状态
+const status = await fal.queue.status("ai-app-endpoint", { requestId: request_id, logs: true });
+
+// 获取结果
+const result = await fal.queue.result("ai-app-endpoint", { requestId: request_id });
+console.log(result.data);
+
+// 上传文件
+const url = await fal.storage.upload(file);</code></pre>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Playground -->
+        <section id="playgroundPane" class="pane" aria-labelledby="Playground">
+            <div class="split">
+                <div class="panel left">
+                    <div class="panel-header">
+                        <h3>输入区</h3>
+                        <button class="ghost"><i class="fas fa-sliders"></i> Form</button>
+                    </div>
+                    <div class="form-block">
+                        <label class="req">输入内容</label>
+                        <textarea id="promptInput" rows="6" placeholder="请输入您的输入内容..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field">
+                            <label>参数设置</label>
+                            <select id="paramSelect">
+                                <option value="default">默认</option>
+                                <option value="high">高质量</option>
+                                <option value="fast">快速</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn" id="resetBtn">重置</button>
+                        <button class="btn primary" id="runBtn">运行</button>
+                    </div>
+
+                    <section class="price-note">
+                        <h4>价格</h4>
+                        <p id="priceNote">API调用每次¥0.05元。统一调用平台API接口，无并发限制，无队列限制，消耗钱包。</p>
+                    </section>
+                </div>
+                <div class="panel right">
+                    <div class="panel-header">
+                        <h3>结果展示区</h3>
+                        <div class="right-actions">
+                            <button class="ghost"><i class="fas fa-eye"></i> Preview</button>
+                        </div>
+                    </div>
+                    <div class="preview" id="previewBox">
+                        <span class="preview-icon"><i class="far fa-image"></i></span>
+                    </div>
+                    <div class="preview-actions">
+                        <button class="ghost"><i class="fas fa-share"></i> Share</button>
+                        <button class="ghost"><i class="fas fa-download"></i> Download</button>
+                    </div>
+                    <details class="logs">
+                        <summary>Show logs</summary>
+                        <pre id="logBox"></pre>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- API KEY类型及权益对比弹窗 -->
+    <div class="modal" id="comparisonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>API KEY类型及权益对比</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 第一部分：API KEY类型 -->
+                <div class="api-types-section">
+                    <h4 class="section-title">API KEY 类型</h4>
+                    <div class="api-type-cards">
+                        <div class="api-type-card card-member">
+                            <h5>消费级-会员API</h5>
+                            <p>该API适合个人和小团队使用。基础版支持1并发，专业版支持3并发，专业Plus版支持5并发。基于强大的ComfyUI环境，支持7*24小时稳定运行和高效工作流，满足小规模创作需求。</p>
+                            <button class="card-btn btn-blue">去开通</button>
+                        </div>
+                        <div class="api-type-card card-shared">
+                            <h5>企业级-共享API</h5>
+                            <p>该共享API基于RH公共资源池，提供弹性调用服务，默认并发为50，按实际使用计费。用户可以灵活调用各类工作流，按需扩展调用规模。适合日常业务接入、批量处理、阶段性增长等场景，平衡灵活性与成本效益。</p>
+                            <button class="card-btn btn-orange">去充值</button>
+                        </div>
+                        <div class="api-type-card card-exclusive">
+                            <h5>企业级-独占API</h5>
+                            <p>该独占API为性能敏感或大规模生产环境提供专用计算资源。通过独立租用GPU算力，用户可以享受固定并发和稳定响应速度。特别适合对高并发、低延迟、稳定性要求严格的核心业务场景。</p>
+                            <button class="card-btn btn-orange">去开通</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二部分：API KEY权益对比 -->
+                <div class="api-comparison-section">
+                    <h4 class="section-title">API KEY 权益对比</h4>
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>消费级-会员API</th>
+                                    <th>企业级-共享API</th>
+                                    <th>企业级-独占API</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>适用场景</strong></td>
+                                    <td>个人或团队内部使用</td>
+                                    <td>商业场景灵活调用，按需使用</td>
+                                    <td>高并发生产、性能敏感场景</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GPU 资源池</strong></td>
+                                    <td>共享资源池</td>
+                                    <td>共享资源池</td>
+                                    <td>独占资源池</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GPU 类型</strong></td>
+                                    <td>90系列 24G/48G</td>
+                                    <td>90系列 24G/48G</td>
+                                    <td>90系列 24G/48G</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>充值模式</strong></td>
+                                    <td>会员套餐</td>
+                                    <td>钱包预充值</td>
+                                    <td>独占套餐</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>计费模式</strong></td>
+                                    <td>会员权益，消耗RH币</td>
+                                    <td>消耗钱包余额，按运行时长计费</td>
+                                    <td>周期性租用，不限调用次数</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>定价</strong></td>
+                                    <td>同会员套餐</td>
+                                    <td>模型创作和快捷创作（专用GPU）¥2.5/小时，按秒计费；标准运行（90系列 24G）¥4/小时，按秒计费；Plus运行（90系列 48G）¥6/小时，按秒计费。注：多并发任务时，成本按累计运行时长计算，不使用不收费</td>
+                                    <td>独占（90系列 24G显存）¥1500/路/月；独占Plus（90系列 48G显存）¥2250/路/月</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>API 并发数</strong></td>
+                                    <td>同会员权益</td>
+                                    <td>默认50，提升并发请联系：jason@runninghub.ai</td>
+                                    <td>任务并发数等于购买的GPU数量</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>高速队列</strong></td>
+                                    <td>会员高速队列</td>
+                                    <td>企业级高速队列</td>
+                                    <td>企业级高速队列</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>主要优势</strong></td>
+                                    <td>个人使用高性价比</td>
+                                    <td>弹性灵活高并发商业场景</td>
+                                    <td>独占算力，累积缓存，运行速度快且稳定</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>页面任务权益</strong></td>
+                                    <td>同会员权益</td>
+                                    <td>无</td>
+                                    <td>见独占套餐产品说明</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>并存关系</strong></td>
+                                    <td>可同时开启共享API</td>
+                                    <td>可同时开启会员或独占API</td>
+                                    <td>可同时开启共享API</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>缓存说明</strong></td>
+                                    <td colspan="3">
+                                        <div style="line-height: 1.8;">
+                                            存在缓存时，任务运行时长将大幅减少<br><br>
+                                            共享资源池：任务在资源池内调度；如调度到不同机器，可能出现无缓存运行，导致运行时长增加<br><br>
+                                            独占资源池：相同工作流连续运行时，缓存状态会保持；一旦切换工作流，缓存将被清空。如需始终保持缓存，当前可通过多个账号绑定独立工作流实现
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AI应用详情页面的模型卡片数据（与ai-apps-detail.html相同）
+        const aiAppsDetailModels = {
+            '普通AI应用': [
+                { name: '万物高清放大(分块)seedVR2', taskType: 'Image to Image', description: '支持分块处理的高清图像放大模型，使用seedVR2技术', runCount: 18000, likeCount: 1500, favoriteCount: 950, source: { channelName: '官方' } },
+                { name: 'Viduq2 多张参考生视频(角色一致性)', taskType: 'Image to Video', description: '支持多张参考图生成视频，保持角色一致性', runCount: 15000, likeCount: 1200, favoriteCount: 800, source: { channelName: '官方' } },
+                { name: 'RH Veo3.1 Image2Video', taskType: 'Image to Video', description: '基于Veo 3.1的图像转视频模型', runCount: 32000, likeCount: 2800, favoriteCount: 1500, source: { channelName: '官方' } },
+                { name: '即梦AI-图生视频3.0 PRO', taskType: 'Image to Video', description: '即梦AI最新版本的图生视频模型', runCount: 8500, likeCount: 650, favoriteCount: 420, source: { channelName: '官方' } },
+                { name: 'Qwen ——影视剧情分镜制作（ai短剧）', taskType: 'Text to Video', description: '专为影视分镜和短剧制作设计的AI模型', runCount: 12000, likeCount: 950, favoriteCount: 580, source: { channelName: '官方' } },
+                { name: 'Qwen文生图-卡通，国风，游戏，渲染人物风格加强', taskType: 'Text to Image', description: '支持多种风格的文生图模型', runCount: 28000, likeCount: 2200, favoriteCount: 1300, source: { channelName: '官方' } },
+                { name: 'Q版打工人表情包', taskType: 'Text to Image', description: '生成Q版打工人风格的表情包', runCount: 5600, likeCount: 420, favoriteCount: 280, source: { channelName: '官方' } }
+            ],
+            '快捷创作': [
+                { name: 'Nano', taskType: 'Text to Image', description: '快速图像生成模型', runCount: 45000, likeCount: 3800, favoriteCount: 2100, source: { channelName: '官方' } },
+                { name: 'Sor02 文生视频', taskType: 'Text to Video', description: 'Sora 2文本生成视频模型', runCount: 38000, likeCount: 3200, favoriteCount: 1800, source: { channelName: '官方' } },
+                { name: 'Sor02 图生视频', taskType: 'Image to Video', description: 'Sora 2图像生成视频模型', runCount: 35000, likeCount: 2900, favoriteCount: 1650, source: { channelName: '官方' } },
+                { name: 'WAN2.2 文生视频', taskType: 'Text to Video', description: 'WAN 2.2文本生成视频模型', runCount: 22000, likeCount: 1800, favoriteCount: 1000, source: { channelName: '官方' } },
+                { name: 'WAN2.2 图生视频', taskType: 'Image to Video', description: 'WAN 2.2图像生成视频模型', runCount: 18000, likeCount: 1500, favoriteCount: 850, source: { channelName: '官方' } },
+                { name: 'Flux 文生图', taskType: 'Text to Image', description: 'Flux文本生成图像模型', runCount: 52000, likeCount: 4500, favoriteCount: 2500, source: { channelName: '官方' } },
+                { name: 'Qwen 文生图', taskType: 'Text to Image', description: 'Qwen文本生成图像模型', runCount: 31000, likeCount: 2600, favoriteCount: 1450, source: { channelName: '官方' } },
+                { name: '参考生图-P图', taskType: 'Image to Image', description: '基于参考图的图像编辑和生成', runCount: 14000, likeCount: 1100, favoriteCount: 620, source: { channelName: '官方' } }
+            ],
+            '模型创作': [
+                { name: 'qwen_image_fp8_e4m3fn', taskType: 'Text to Image', description: 'Qwen图像生成模型FP8优化版本', runCount: 8900, likeCount: 720, favoriteCount: 450, source: { channelName: '官方' } },
+                { name: 'daouoomeu_xusnxu', taskType: 'Text to Image', description: '专业图像生成模型', runCount: 7200, likeCount: 580, favoriteCount: 360, source: { channelName: '官方' } },
+                { name: 'WAN2.2', taskType: 'Text to Video', description: 'WAN 2.2视频生成模型', runCount: 25000, likeCount: 2100, favoriteCount: 1200, source: { channelName: '官方' } }
+            ]
+        };
+
+        // 格式化数字
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // 查找模型，返回模型和所属类别
+        function findModelByName(name) {
+            // 优先从本地数据查找
+            for (const category in aiAppsDetailModels) {
+                const model = aiAppsDetailModels[category].find(m => m.name === name);
+                if (model) {
+                    // 返回模型对象，并添加类别信息
+                    return { ...model, category: category };
+                }
+            }
+            
+            // 如果本地数据没找到，尝试从全局数据中查找
+            if (window._allApisData && Array.isArray(window._allApisData)) {
+                const model = window._allApisData.find(item => item.name === name);
+                if (model) {
+                    // 尝试从类别数据中确定类别
+                    let category = '普通AI应用'; // 默认类别
+                    for (const cat in aiAppsDetailModels) {
+                        if (aiAppsDetailModels[cat].some(m => m.name === name)) {
+                            category = cat;
+                            break;
+                        }
+                    }
+                    // 处理类别名称：'AI应用' 统一为 '普通AI应用'
+                    if (category === 'AI应用') {
+                        category = '普通AI应用';
+                    }
+                    return { ...model, category: category };
+                }
+            }
+            
+            return null;
+        }
+
+        // 加载模型详情
+        function loadModelDetail() {
+            const params = new URLSearchParams(window.location.search);
+            const modelName = decodeURIComponent(params.get('name') || '');
+            
+            if (!modelName) {
+                document.getElementById('modelTitle').textContent = '未找到模型';
+                return;
+            }
+
+            // 尝试加载模型，如果数据还没加载完成，等待一下
+            function tryLoad() {
+                const model = findModelByName(modelName);
+                
+                if (!model) {
+                    // 如果数据还没加载，等待一下再试
+                    if (window._allApisData === undefined || (window._allApisData && window._allApisData.length === 0)) {
+                        setTimeout(tryLoad, 200);
+                        return;
+                    }
+                    document.getElementById('modelTitle').textContent = '未找到模型';
+                    return;
+                }
+                
+                // 找到了模型，更新页面
+                // model 现在包含 category 字段
+                updateModelDetail(model);
+            }
+            
+            tryLoad();
+        }
+
+        // 更新模型详情页面
+        function updateModelDetail(model) {
+
+            // 更新页面信息
+            document.getElementById('modelTitle').textContent = model.name;
+            document.getElementById('modelDescription').textContent = model.description || '';
+            document.getElementById('runCountDisplay').textContent = formatNumber(model.runCount || 0);
+            document.getElementById('likeCountDisplay').textContent = formatNumber(model.likeCount || 0);
+            document.getElementById('favoriteCountDisplay').textContent = formatNumber(model.favoriteCount || 0);
+            document.getElementById('aboutText').textContent = model.description || '';
+
+            // 判断模型类型（根据模型名称或来源判断，这里可以根据实际业务逻辑调整）
+            // 优先使用 modelType 字段，如果没有则根据来源判断
+            const isThirdParty = model.modelType === 'thirdParty' || 
+                                 (model.source && (model.source.channelName === '三方' || model.source.channelName === '第三方')) ||
+                                 (model.name && (model.name.includes('Qwen') || model.name.includes('即梦AI')));
+            
+            // 更新标签显示
+            const thirdPartyTag = document.getElementById('thirdPartyTag');
+            const ownModelTag = document.getElementById('ownModelTag');
+            const bothModelTable = document.getElementById('bothModelTable');
+            const ownModelOnlyTable = document.getElementById('ownModelOnlyTable');
+
+            if (isThirdParty) {
+                // 同时显示两个标签
+                if (thirdPartyTag) thirdPartyTag.style.display = 'inline-block';
+                if (ownModelTag) ownModelTag.style.display = 'inline-block';
+                // 显示表格1
+                if (bothModelTable) bothModelTable.style.display = 'table';
+                if (ownModelOnlyTable) ownModelOnlyTable.style.display = 'none';
+                // 更新价格（如果模型有价格信息）
+                updateBothModelTablePrices(model);
+            } else {
+                // 只显示自有模型标签
+                if (thirdPartyTag) thirdPartyTag.style.display = 'none';
+                if (ownModelTag) ownModelTag.style.display = 'inline-block';
+                // 显示表格2
+                if (bothModelTable) bothModelTable.style.display = 'none';
+                if (ownModelOnlyTable) ownModelOnlyTable.style.display = 'table';
+            }
+            
+            // 根据类别更新运行时长消耗费用
+            // 处理类别名称：'AI应用' 和 '普通AI应用' 都视为普通AI应用
+            let category = model.category || '普通AI应用';
+            if (category === 'AI应用') {
+                category = '普通AI应用';
+            }
+            updateRuntimeCostsByCategory(category, model);
+        }
+        
+        // 根据类别更新运行时长消耗费用
+        function updateRuntimeCostsByCategory(category, model) {
+            // 获取表格中的"运行时长消耗费用"行
+            const bothModelTable = document.getElementById('bothModelTable');
+            const ownModelOnlyTable = document.getElementById('ownModelOnlyTable');
+            
+            // 处理表格1（bothModelTable）
+            if (bothModelTable && bothModelTable.style.display !== 'none') {
+                const bothRuntimeRow = bothModelTable.querySelector('tbody tr:nth-child(2)'); // 第二行是运行时长消耗费用
+                if (bothRuntimeRow) {
+                    const cells = bothRuntimeRow.querySelectorAll('td');
+                    if (cells.length >= 4) {
+                        if (category === '快捷创作') {
+                            // 快捷创作：消费级显示"每秒消耗0.2个RH币"，企业级-共享显示"¥2.5/小时，按秒计费"
+                            cells[1].innerHTML = '每秒消耗0.2个RH币';
+                            cells[2].innerHTML = '¥2.5/小时，按秒计费';
+                            cells[3].innerHTML = '租期内免费';
+                        } else if (category === '模型创作') {
+                            // 模型创作：消费级显示"XX个RH币/次"，企业级-共享显示"¥2.5/小时，按秒计费"
+                            // 这里需要从模型数据中获取价格，如果没有则显示占位符
+                            const pricePerCall = model.pricing?.domestic?.tiers?.[0]?.price || 'XX';
+                            cells[1].innerHTML = `${pricePerCall}个RH币/次`;
+                            cells[2].innerHTML = '¥2.5/小时，按秒计费';
+                            cells[3].innerHTML = '租期内免费';
+                        }
+                        // 普通AI应用 或 AI应用：保持现有显示不变，不需要修改
+                    }
+                }
+            }
+            
+            // 处理表格2（ownModelOnlyTable）
+            if (ownModelOnlyTable && ownModelOnlyTable.style.display !== 'none') {
+                const ownRuntimeRow = ownModelOnlyTable.querySelector('tbody tr:first-child'); // 第一行是运行时长消耗费用
+                if (ownRuntimeRow) {
+                    const cells = ownRuntimeRow.querySelectorAll('td');
+                    if (cells.length >= 4) {
+                        if (category === '快捷创作') {
+                            // 快捷创作：消费级显示"每秒消耗0.2个RH币"，企业级-共享显示"¥2.5/小时，按秒计费"
+                            cells[1].innerHTML = '每秒消耗0.2个RH币';
+                            cells[2].innerHTML = '¥2.5/小时，按秒计费';
+                            cells[3].innerHTML = '租期内免费';
+                        } else if (category === '模型创作') {
+                            // 模型创作：消费级显示"XX个RH币/次"，企业级-共享显示"¥2.5/小时，按秒计费"
+                            const pricePerCall = model.pricing?.domestic?.tiers?.[0]?.price || 'XX';
+                            cells[1].innerHTML = `${pricePerCall}个RH币/次`;
+                            cells[2].innerHTML = '¥2.5/小时，按秒计费';
+                            cells[3].innerHTML = '租期内免费';
+                        }
+                        // 普通AI应用 或 AI应用：保持现有显示不变，不需要修改
+                    }
+                }
+            }
+        }
+
+        // 更新表格1的价格（三方模型API和自有模型API）
+        function updateBothModelTablePrices(model) {
+            // 这里可以根据实际价格数据更新
+            // 暂时使用默认值
+            const price1 = document.getElementById('bothThirdPartyPrice1');
+            const price2 = document.getElementById('bothThirdPartyPrice2');
+            const price3 = document.getElementById('bothThirdPartyPrice3');
+            
+            // 如果有价格数据，可以在这里更新
+            // 暂时保持默认值
+        }
+
+        // 标签页切换
+        function wireTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const panes = document.querySelectorAll('.pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const linkType = tab.getAttribute('data-link');
+                    
+                    // 如果有点击链接属性，跳转到新窗口
+                    if (linkType) {
+                        const params = new URLSearchParams(window.location.search);
+                        const modelName = params.get('name') || '';
+                        const modelId = params.get('id') || '';
+                        
+                        let url = '';
+                        if (linkType === 'playground') {
+                            // 根据模型类别判断跳转目标
+                            const model = findModelByName(modelName);
+                            const category = model ? (model.category || '普通AI应用') : '普通AI应用';
+                            
+                            // 只有"普通AI应用"类别的模型才跳转到ai-detail.html
+                            if (category === '普通AI应用') {
+                                url = `ai-detail.html`;
+                            } else {
+                                // 其他类别保持原有逻辑
+                                url = `ai-apps-playground.html?name=${encodeURIComponent(modelName)}&id=${encodeURIComponent(modelId)}`;
+                            }
+                        }
+                        
+                        if (url) {
+                            window.open(url, '_blank');
+                        }
+                        return;
+                    }
+                    
+                    // 原有的切换逻辑（用于 API 标签）
+                    const targetId = tab.getAttribute('data-target');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    panes.forEach(p => p.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    if (targetId) {
+                        const targetPane = document.querySelector(targetId);
+                        if (targetPane) targetPane.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // 复制按钮
+        function wireCopyButton() {
+            const copyBtn = document.getElementById('copyModelNameBtn');
+            const modelTitle = document.getElementById('modelTitle');
+            
+            if (copyBtn && modelTitle) {
+                copyBtn.addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText(modelTitle.textContent);
+                        // 可以添加提示
+                        const originalHTML = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalHTML;
+                        }, 1000);
+                    } catch (err) {
+                        console.error('复制失败:', err);
+                    }
+                });
+            }
+        }
+
+        // 对比弹窗
+        function wireComparisonModal() {
+            const comparisonBtn = document.getElementById('comparisonLinkBtn');
+            const comparisonModal = document.getElementById('comparisonModal');
+            const modalClose = comparisonModal?.querySelector('.modal-close');
+            
+            if (comparisonBtn && comparisonModal) {
+                comparisonBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    comparisonModal.classList.add('show');
+                });
+            }
+            
+            if (modalClose && comparisonModal) {
+                modalClose.addEventListener('click', function() {
+                    comparisonModal.classList.remove('show');
+                });
+            }
+            
+            if (comparisonModal) {
+                comparisonModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('show');
+                    }
+                });
+            }
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && comparisonModal?.classList.contains('show')) {
+                    comparisonModal.classList.remove('show');
+                }
+            });
+        }
+
+        // 下拉菜单
+        function addDropdownInteractions() {
+            const dropdownBtns = document.querySelectorAll('.dropdown-btn');
+            
+            dropdownBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dropdownId = this.getAttribute('data-dropdown');
+                    const dropdown = document.getElementById(`${dropdownId}-dropdown`);
+                    
+                    // 关闭其他下拉菜单
+                    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                        if (menu !== dropdown) {
+                            menu.classList.remove('show');
+                        }
+                    });
+                    
+                    if (dropdown) {
+                        dropdown.classList.toggle('show');
+                    }
+                });
+            });
+            
+            // 点击外部关闭下拉菜单
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadModelDetail();
+            wireTabs();
+            wireCopyButton();
+            wireComparisonModal();
+            addDropdownInteractions();
+        });
+    </script>
+</body>
+</html>

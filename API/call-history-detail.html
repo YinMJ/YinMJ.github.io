@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调用记录详情 - RunningHub</title>
+    <link rel="stylesheet" href="standard-models-fixed.css?v=20251038">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* 详情页面样式 */
+        .call-history-detail-page {
+            background: var(--rh-bg);
+            color: var(--rh-text);
+            min-height: 100vh;
+            padding-top: 60px;
+        }
+
+        /* 页面头部 */
+        .detail-header {
+            background: var(--rh-surface);
+            border-bottom: 0.5px solid var(--rh-border);
+            padding: 24px 0;
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+        }
+
+        .detail-header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--rh-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: var(--rh-surface-2);
+            border-color: var(--rh-primary);
+            color: var(--rh-primary);
+        }
+
+        .detail-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--rh-text);
+            margin: 0;
+        }
+
+        /* 主要内容区域 */
+        .detail-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* 信息卡片 */
+        .info-card {
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--rh-text);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 0.5px solid var(--rh-border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: var(--rh-muted);
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: var(--rh-text);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: rgba(52, 199, 89, 0.1);
+            color: #34c759;
+        }
+
+        .status-error {
+            background: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+        }
+
+        .status-pending {
+            background: rgba(255, 149, 0, 0.1);
+            color: #ff9500;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--rh-surface-2);
+            color: var(--rh-muted);
+        }
+
+        .key-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .key-type-consumer {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--rh-primary);
+        }
+
+        .key-type-shared {
+            background: rgba(52, 199, 89, 0.1);
+            color: #34c759;
+        }
+
+        .key-type-exclusive {
+            background: rgba(255, 149, 0, 0.1);
+            color: #ff9500;
+        }
+
+        /* 代码块样式 */
+        .code-block {
+            background: var(--rh-surface-2);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--rh-text);
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .code-block.empty {
+            color: var(--rh-muted);
+            font-style: italic;
+        }
+
+        /* 错误信息样式 */
+        .error-info {
+            background: rgba(255, 59, 48, 0.05);
+            border: 0.5px solid rgba(255, 59, 48, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            color: #ff3b30;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* 生成结果模块样式 */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .result-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--rh-surface-2);
+            border: 0.5px solid var(--rh-border);
+            transition: all 0.2s ease;
+        }
+
+        .result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: var(--rh-primary);
+        }
+
+        .result-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .result-item video {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+        }
+
+        .result-item audio {
+            width: 100%;
+            padding: 12px;
+        }
+
+        .result-item .result-type-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        .result-item .result-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .result-item:hover .result-actions {
+            opacity: 1;
+        }
+
+        .result-item .result-action-btn {
+            flex: 1;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--rh-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .result-item .result-action-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        .result-item .result-index {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        .result-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--rh-muted);
+            font-size: 14px;
+        }
+
+        .result-empty i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .detail-header-content,
+            .detail-content {
+                padding: 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .detail-title {
+                font-size: 1.25rem;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .result-item .result-actions {
+                opacity: 1; /* 移动端始终显示操作按钮 */
+            }
+        }
+    </style>
+</head>
+<body class="standard-models-page call-history-detail-page">
+    <!-- 顶部导航栏 -->
+    <header class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <span class="logo-icon">R</span> RunningHUB
+                </div>
+            </div>
+            <div class="nav-right">
+                <button class="nav-btn" onclick="window.location.href='index.html'">
+                    <i class="fas fa-home"></i>
+                </button>
+                <button class="nav-btn">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="nav-btn">
+                    <i class="fas fa-gem"></i>
+                </button>
+                <button class="nav-btn primary" onclick="window.location.href='admin.html'">
+                    进入控制台
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面头部 -->
+    <div class="detail-header">
+        <div class="detail-header-content">
+            <a href="#" class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i>
+                返回
+            </a>
+            <h1 class="detail-title">调用记录详情</h1>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="detail-content">
+        <!-- 基本信息 -->
+        <div class="info-card">
+            <div class="card-title">
+                <i class="fas fa-info-circle"></i>
+                基本信息
+            </div>
+            <div class="info-grid" id="basicInfo">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 生成结果 -->
+        <div class="info-card">
+            <div class="card-title">
+                <i class="fas fa-images"></i>
+                生成结果
+            </div>
+            <div id="resultsContainer">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 请求信息 -->
+        <div class="info-card">
+            <div class="card-title">
+                <i class="fas fa-paper-plane"></i>
+                请求信息
+            </div>
+            <div class="info-item">
+                <span class="info-label">请求ID</span>
+                <span class="info-value" id="requestId">-</span>
+            </div>
+            <div class="info-item" style="margin-top: 16px;">
+                <span class="info-label">请求参数</span>
+                <div class="code-block" id="requestParams">
+                    <pre>-</pre>
+                </div>
+            </div>
+            <div class="info-item" style="margin-top: 16px;">
+                <span class="info-label">请求时间</span>
+                <span class="info-value" id="requestTime">-</span>
+            </div>
+        </div>
+
+        <!-- 响应信息 -->
+        <div class="info-card">
+            <div class="card-title">
+                <i class="fas fa-reply"></i>
+                响应信息
+            </div>
+            <div class="info-item">
+                <span class="info-label">响应状态</span>
+                <span id="responseStatus">-</span>
+            </div>
+            <div class="info-item" style="margin-top: 16px;">
+                <span class="info-label">响应时间</span>
+                <span class="info-value" id="responseTime">-</span>
+            </div>
+            <div class="info-item" style="margin-top: 16px;">
+                <span class="info-label">响应内容</span>
+                <div class="code-block" id="responseContent">
+                    <pre>-</pre>
+                </div>
+            </div>
+            <div id="errorInfo" style="display: none; margin-top: 16px;">
+                <span class="info-label">错误信息</span>
+                <div class="error-info" id="errorContent">-</div>
+            </div>
+        </div>
+
+        <!-- 计费信息 -->
+        <div class="info-card">
+            <div class="card-title">
+                <i class="fas fa-calculator"></i>
+                计费信息
+            </div>
+            <div class="info-grid" id="billingInfo">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 从URL参数获取记录ID和返回参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const recordId = parseInt(urlParams.get('id')) || null;
+        const returnSearch = urlParams.get('search') || '';
+        const returnFilter = urlParams.get('filter') || 'all';
+        const returnPage = parseInt(urlParams.get('page')) || 1;
+
+        // 构建返回URL
+        function buildReturnUrl() {
+            const params = new URLSearchParams();
+            if (returnSearch) params.set('search', returnSearch);
+            if (returnFilter !== 'all') params.set('filter', returnFilter);
+            if (returnPage > 1) params.set('page', returnPage);
+            
+            const queryString = params.toString();
+            return queryString ? `call-history.html?${queryString}` : 'call-history.html';
+        }
+
+        // 返回按钮点击事件
+        document.getElementById('backBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = buildReturnUrl();
+        });
+
+        // 模拟数据（实际应从后端API获取）
+        // 这里需要根据recordId获取对应的详情数据
+        function getDetailData(id) {
+            // 这里应该从实际的后端API获取数据
+            // 为了演示，我们生成模拟数据
+            const apiNames = [
+                'Nano Banana', 'Flux Kontext', 'Stable Diffusion XL', 'LLaMA 3.1', 'Veo 3.1',
+                '智能抠图', '文案自动生成', '老照片修复', '图像超分辨率', '语音转文字',
+                '影视分镜生成工作流', '多风格插画批量制作', 'AI 视频剪辑', '图像风格迁移', '文本摘要生成'
+            ];
+            const apiTypes = ['标准模型API', 'AI应用API', 'ComfyUI工作流API'];
+            const keyTypes = ['消费级-会员', '企业级-共享', '企业级-独占'];
+            const statuses = ['success', 'error'];
+            
+            const apiName = apiNames[id % apiNames.length];
+            const apiType = apiTypes[id % apiTypes.length];
+            const keyType = keyTypes[id % keyTypes.length];
+            const status = statuses[id % 2]; // 简单模拟
+            
+            // 随机生成区域（70%国内，30%国外）
+            const region = id % 10 < 7 ? 'domestic' : 'international';
+            
+            // 生成请求ID
+            const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            // 生成请求参数（根据API类型不同）
+            let requestParams = {};
+            if (apiType === '标准模型API') {
+                requestParams = {
+                    prompt: id % 2 === 0 ? '生成一张美丽的风景画' : '生成一张科幻风格的图像',
+                    model: apiName,
+                    size: '512x512',
+                    num_images: 1
+                };
+            } else if (apiType === 'AI应用API') {
+                requestParams = {
+                    image_url: 'https://example.com/input.jpg',
+                    operation: apiName === '智能抠图' ? 'remove_background' : 'enhance',
+                    options: {
+                        quality: 'high'
+                    }
+                };
+            } else {
+                requestParams = {
+                    workflow_id: `workflow_${id}`,
+                    inputs: {
+                        prompt: 'Generate creative content',
+                        style: 'artistic'
+                    }
+                };
+            }
+            
+            // 生成响应内容
+            let responseContent = {};
+            let errorContent = '';
+            let results = []; // 生成结果数组
+            
+            if (status === 'success') {
+                if (apiType === '标准模型API') {
+                    // 标准模型API可能生成多张图片
+                    const imageCount = (id % 3) + 1; // 1-3张图片
+                    results = [];
+                    for (let i = 0; i < imageCount; i++) {
+                        results.push({
+                            type: 'image',
+                            url: `https://picsum.photos/512/512?random=${id}_${i}`,
+                            index: i + 1
+                        });
+                    }
+                    responseContent = {
+                        images: results.map(r => ({
+                            url: r.url,
+                            width: 512,
+                            height: 512
+                        })),
+                        usage: {
+                            prompt_tokens: 45,
+                            completion_tokens: 0
+                        }
+                    };
+                } else if (apiType === 'AI应用API') {
+                    // AI应用API可能生成图片、视频或音频
+                    const resultType = id % 3; // 0: 图片, 1: 视频, 2: 音频
+                    if (resultType === 0) {
+                        // 图片结果（可能多张）
+                        const imageCount = (id % 2) + 1; // 1-2张
+                        results = [];
+                        for (let i = 0; i < imageCount; i++) {
+                            results.push({
+                                type: 'image',
+                                url: `https://picsum.photos/800/600?random=${id}_${i}`,
+                                index: i + 1
+                            });
+                        }
+                    } else if (resultType === 1) {
+                        // 视频结果
+                        results = [{
+                            type: 'video',
+                            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                            thumbnail: 'https://picsum.photos/800/450?random=' + id,
+                            index: 1
+                        }];
+                    } else {
+                        // 音频结果
+                        results = [{
+                            type: 'audio',
+                            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+                            index: 1
+                        }];
+                    }
+                    responseContent = {
+                        result_url: results[0]?.url || 'https://example.com/result.jpg',
+                        processing_time: 2.5,
+                        results: results
+                    };
+                } else {
+                    // ComfyUI工作流API可能生成多种类型的结果
+                    const resultCount = (id % 4) + 1; // 1-4个结果
+                    results = [];
+                    for (let i = 0; i < resultCount; i++) {
+                        const typeIndex = (id + i) % 3;
+                        if (typeIndex === 0) {
+                            results.push({
+                                type: 'image',
+                                url: `https://picsum.photos/1024/1024?random=${id}_${i}`,
+                                index: i + 1
+                            });
+                        } else if (typeIndex === 1) {
+                            results.push({
+                                type: 'video',
+                                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                                thumbnail: `https://picsum.photos/800/450?random=${id}_${i}`,
+                                index: i + 1
+                            });
+                        } else {
+                            results.push({
+                                type: 'audio',
+                                url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+                                index: i + 1
+                            });
+                        }
+                    }
+                    responseContent = {
+                        workflow_output: results[0]?.url || 'https://example.com/workflow/output.jpg',
+                        steps_completed: 5,
+                        results: results
+                    };
+                }
+            } else {
+                errorContent = `错误代码: API_ERROR_${id % 1000}\n错误信息: 请求处理失败，请检查输入参数是否正确。\n详细错误: ${apiType}服务暂时不可用，请稍后重试。`;
+            }
+            
+            // 计算RH币和消费金额
+            let rhCoin = 0;
+            let cost = 0;
+            if (status === 'success') {
+                if (keyType === '企业级-独占') {
+                    rhCoin = 0;
+                    cost = 0;
+                } else if (keyType === '企业级-共享') {
+                    rhCoin = 0;
+                    cost = parseFloat((Math.random() * 0.2 + 0.02).toFixed(2));
+                } else {
+                    rhCoin = Math.floor(Math.random() * 10) + 1;
+                    if (Math.random() < 0.3) {
+                        cost = parseFloat((Math.random() * 0.1 + 0.01).toFixed(2));
+                    }
+                }
+            }
+            
+            // 生成时间
+            const date = new Date();
+            date.setDate(date.getDate() - (id % 30));
+            date.setHours(date.getHours() - (id % 24));
+            date.setMinutes(date.getMinutes() - (id % 60));
+            const requestTime = date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                fractionalSecondDigits: 3
+            }).replace(/\//g, '-');
+            
+            const responseTime = new Date(date.getTime() + (Math.random() * 3000 + 500)).toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                fractionalSecondDigits: 3
+            }).replace(/\//g, '-');
+            
+            return {
+                id: id,
+                apiName: apiName,
+                apiType: apiType,
+                keyType: keyType,
+                status: status,
+                requestId: requestId,
+                requestTime: requestTime,
+                responseTime: responseTime,
+                responseDuration: (Math.random() * 2000 + 500).toFixed(0) + 'ms',
+                requestParams: requestParams,
+                responseContent: responseContent,
+                errorContent: errorContent,
+                rhCoin: rhCoin,
+                cost: cost,
+                region: region,
+                hasThirdParty: keyType === '消费级-会员' && cost > 0,
+                results: results // 添加生成结果数组
+            };
+        }
+
+        // 格式化消费金额显示（只显示数值，不显示单位）
+        function formatCostValue(cost) {
+            if (cost === 0 || cost === null || cost === undefined) {
+                return '0.00';
+            }
+            return parseFloat(cost).toFixed(2);
+        }
+
+        // 获取货币符号（根据region）
+        function getCurrencySymbol(region) {
+            return region === 'domestic' ? '¥' : '$';
+        }
+
+        // 渲染页面
+        function renderDetail() {
+            if (!recordId) {
+                alert('无效的记录ID');
+                window.location.href = 'call-history.html';
+                return;
+            }
+
+            const data = getDetailData(recordId);
+
+            // 渲染基本信息
+            const basicInfo = document.getElementById('basicInfo');
+            basicInfo.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">API 名称</span>
+                    <span class="info-value">${data.apiName}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">API 类型</span>
+                    <span class="type-badge">${data.apiType}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">密钥类型</span>
+                    <span class="key-type-badge key-type-${data.keyType === '消费级-会员' ? 'consumer' : data.keyType === '企业级-共享' ? 'shared' : 'exclusive'}">${data.keyType}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">调用状态</span>
+                    <span class="status-badge status-${data.status}">
+                        <i class="fas fa-${data.status === 'success' ? 'check-circle' : 'times-circle'}"></i>
+                        ${data.status === 'success' ? '成功' : '失败'}
+                    </span>
+                </div>
+            `;
+
+            // 渲染请求信息
+            document.getElementById('requestId').textContent = data.requestId;
+            document.getElementById('requestTime').textContent = data.requestTime;
+            const requestParamsBlock = document.getElementById('requestParams');
+            requestParamsBlock.innerHTML = `<pre>${JSON.stringify(data.requestParams, null, 2)}</pre>`;
+
+            // 渲染响应信息
+            const responseStatusEl = document.getElementById('responseStatus');
+            responseStatusEl.innerHTML = `
+                <span class="status-badge status-${data.status}">
+                    <i class="fas fa-${data.status === 'success' ? 'check-circle' : 'times-circle'}"></i>
+                    ${data.status === 'success' ? '成功' : '失败'}
+                </span>
+            `;
+            document.getElementById('responseTime').textContent = `${data.responseTime} (耗时: ${data.responseDuration})`;
+            
+            const responseContentBlock = document.getElementById('responseContent');
+            if (data.status === 'success') {
+                responseContentBlock.innerHTML = `<pre>${JSON.stringify(data.responseContent, null, 2)}</pre>`;
+                document.getElementById('errorInfo').style.display = 'none';
+            } else {
+                responseContentBlock.innerHTML = '<pre class="empty">无响应内容</pre>';
+                document.getElementById('errorInfo').style.display = 'block';
+                document.getElementById('errorContent').textContent = data.errorContent;
+            }
+
+            // 渲染生成结果
+            const resultsContainer = document.getElementById('resultsContainer');
+            if (data.status === 'success' && data.results && data.results.length > 0) {
+                resultsContainer.innerHTML = `
+                    <div class="results-grid">
+                        ${data.results.map((result, index) => {
+                            if (result.type === 'image') {
+                                return `
+                                    <div class="result-item">
+                                        <span class="result-index">#${result.index}</span>
+                                        <span class="result-type-badge">
+                                            <i class="fas fa-image"></i> 图片
+                                        </span>
+                                        <img src="${result.url}" alt="生成结果 ${result.index}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect fill=\'%23f0f0f0\' width=\'200\' height=\'200\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23999\' font-size=\'14\'%3E图片加载失败%3C/text%3E%3C/svg%3E';">
+                                        <div class="result-actions">
+                                            <button class="result-action-btn" onclick="viewResult('${result.url}', 'image')">
+                                                <i class="fas fa-eye"></i> 查看
+                                            </button>
+                                            <button class="result-action-btn" onclick="downloadResult('${result.url}', 'image_${result.index}.jpg')">
+                                                <i class="fas fa-download"></i> 下载
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (result.type === 'video') {
+                                return `
+                                    <div class="result-item">
+                                        <span class="result-index">#${result.index}</span>
+                                        <span class="result-type-badge">
+                                            <i class="fas fa-video"></i> 视频
+                                        </span>
+                                        <video controls preload="metadata" poster="${result.thumbnail || ''}">
+                                            <source src="${result.url}" type="video/mp4">
+                                            您的浏览器不支持视频播放。
+                                        </video>
+                                        <div class="result-actions">
+                                            <button class="result-action-btn" onclick="viewResult('${result.url}', 'video')">
+                                                <i class="fas fa-eye"></i> 查看
+                                            </button>
+                                            <button class="result-action-btn" onclick="downloadResult('${result.url}', 'video_${result.index}.mp4')">
+                                                <i class="fas fa-download"></i> 下载
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (result.type === 'audio') {
+                                return `
+                                    <div class="result-item">
+                                        <span class="result-index">#${result.index}</span>
+                                        <span class="result-type-badge">
+                                            <i class="fas fa-music"></i> 音频
+                                        </span>
+                                        <audio controls preload="metadata">
+                                            <source src="${result.url}" type="audio/mpeg">
+                                            您的浏览器不支持音频播放。
+                                        </audio>
+                                        <div class="result-actions">
+                                            <button class="result-action-btn" onclick="viewResult('${result.url}', 'audio')">
+                                                <i class="fas fa-eye"></i> 查看
+                                            </button>
+                                            <button class="result-action-btn" onclick="downloadResult('${result.url}', 'audio_${result.index}.mp3')">
+                                                <i class="fas fa-download"></i> 下载
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            return '';
+                        }).join('')}
+                    </div>
+                `;
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="result-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>${data.status === 'success' ? '本次调用未生成结果' : '调用失败，无生成结果'}</p>
+                    </div>
+                `;
+            }
+
+            // 渲染计费信息
+            const billingInfo = document.getElementById('billingInfo');
+            billingInfo.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">RH币消耗</span>
+                    <span class="info-value">${data.rhCoin > 0 ? data.rhCoin + ' 个' : '0 个'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">${getCurrencySymbol(data.region)}钱包消费</span>
+                    <span class="info-value">${formatCostValue(data.cost)}</span>
+                </div>
+                ${data.hasThirdParty ? `
+                <div class="info-item">
+                    <span class="info-label">第三方API</span>
+                    <span class="info-value" style="color: var(--rh-primary);">已调用第三方API</span>
+                </div>
+                ` : ''}
+            `;
+        }
+
+        // 查看结果（在新窗口打开）
+        function viewResult(url, type) {
+            if (type === 'image') {
+                // 图片：在新窗口打开
+                window.open(url, '_blank');
+            } else if (type === 'video') {
+                // 视频：在新窗口打开
+                window.open(url, '_blank');
+            } else if (type === 'audio') {
+                // 音频：在新窗口打开
+                window.open(url, '_blank');
+            }
+        }
+
+        // 下载结果
+        function downloadResult(url, filename) {
+            // 创建临时链接并触发下载
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 页面加载时渲染
+        document.addEventListener('DOMContentLoaded', function() {
+            renderDetail();
+        });
+    </script>
+</body>
+</html>
+

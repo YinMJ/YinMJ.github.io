@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>所有AI应用API - RunningHub</title>
+    <link rel="stylesheet" href="standard-models-fixed.css?v=20251039">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* CSS变量定义 */
+        :root {
+            --rh-bg: #f5f5f7;
+            --rh-surface: #ffffff;
+            --rh-surface-2: #fafafa;
+            --rh-border: #e5e5e7;
+            --rh-text: #1d1d1f;
+            --rh-muted: #6e6e73;
+            --rh-primary: #007aff;
+            --rh-primary-600: #0051d5;
+            --rh-accent: #5ac8fa;
+            --rh-success: #34c759;
+        }
+        
+        /* 所有AI应用页面特定样式 */
+        /* 覆盖 standard-models-fixed.css 中的 padding: 0 */
+        body.standard-models-page.all-ai-apps-page {
+            padding-top: 60px !important; /* top-nav 的高度 */
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        .page-header {
+            background: var(--rh-surface) !important;
+            border-bottom: 0.5px solid var(--rh-border) !important;
+            padding: 24px 0 !important;
+            position: sticky !important;
+            top: 60px !important; /* 位于 top-nav 下方 */
+            z-index: 99 !important;
+            margin-top: 0 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+            width: 100% !important;
+            display: block !important;
+        }
+        
+        /* 主内容区域布局 */
+        .main-content-wrapper {
+            display: flex;
+            gap: 24px;
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 24px 32px 80px;
+            align-items: flex-start;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* 左侧筛选区域 */
+        .filter-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .filter-container {
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 16px;
+            padding: 20px;
+            position: sticky;
+            top: 100px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            z-index: 100;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            position: relative;
+            width: 100%;
+        }
+
+        .filter-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--rh-text);
+            margin: 0;
+            letter-spacing: -0.003em;
+        }
+        
+        .clear-filter-btn {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #f5f5f7;
+            border: none;
+            border-radius: 6px;
+            color: #1d1d1f;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .clear-filter-btn:hover {
+            background: #e5e5e7;
+            color: #1d1d1f;
+        }
+        
+        .clear-filter-btn.show {
+            display: flex;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 4px;
+        }
+        
+        .clear-filter-btn i {
+            font-size: 12px;
+        }
+
+        .filter-group {
+            margin-bottom: 32px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+            margin-top: auto;
+        }
+
+        .filter-group h4 {
+            display: none; /* 隐藏任务类型和模型归属标题 */
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .filter-options::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .filter-options::-webkit-scrollbar-track {
+            background: var(--rh-surface-2);
+            border-radius: 3px;
+        }
+
+        .filter-options::-webkit-scrollbar-thumb {
+            background: var(--rh-border);
+            border-radius: 3px;
+        }
+
+        .filter-options::-webkit-scrollbar-thumb:hover {
+            background: var(--rh-muted);
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            color: var(--rh-text);
+            text-align: left;
+            user-select: none;
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 36px;
+        }
+
+        .filter-option:hover {
+            background: transparent;
+        }
+
+        .filter-option.active {
+            background: transparent;
+        }
+
+        .filter-option-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 1;
+            min-width: 0;
+            gap: 8px;
+        }
+
+        .filter-option-text {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--rh-text);
+        }
+
+        .filter-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 1px solid #d1d1d6;
+            border-radius: 0;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-option:hover .filter-checkbox {
+            border-color: #999;
+        }
+
+        .filter-option.active .filter-checkbox {
+            background: var(--rh-primary);
+            border-color: var(--rh-primary);
+        }
+
+        .filter-option.active .filter-checkbox::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13.5 3.5l-7 7-3.5-3.5 1-1 2.5 2.5 6-6z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .filter-option .count {
+            margin-left: auto;
+            color: #1d1d1f;
+            font-size: 12px;
+            flex-shrink: 0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #f5f5f7;
+            font-weight: 500;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        /* 根据任务类型设置不同的计数背景颜色 - 按照图片中的颜色分类 */
+        /* 紫色组 */
+        .filter-option[data-type="text-to-image"] .count,
+        .filter-option[data-type="text-to-audio"] .count,
+        .filter-option[data-type="text-to-speech"] .count,
+        .filter-option[data-type="text-to-video"] .count,
+        .filter-option[data-type="text-to-3d"] .count,
+        .filter-option[data-type="audio-to-audio"] .count,
+        .filter-option[data-type="audio-to-video"] .count {
+            background: #e8d5e8; /* 浅紫色 */
+        }
+
+        /* 浅蓝色组 */
+        .filter-option[data-type="image-to-image"] .count,
+        .filter-option[data-type="image-to-video"] .count,
+        .filter-option[data-type="image-to-3d"] .count,
+        .filter-option[data-type="image-to-json"] .count {
+            background: #d1e9f6; /* 浅蓝色 */
+        }
+
+        /* 浅绿色组 */
+        .filter-option[data-type="video-to-audio"] .count,
+        .filter-option[data-type="video-to-video"] .count,
+        .filter-option[data-type="vision"] .count {
+            background: #d4edda; /* 浅绿色 */
+        }
+
+        /* 浅粉色组 */
+        .filter-option[data-type="training"] .count {
+            background: #fce4ec; /* 浅粉色 */
+        }
+
+        /* 灰色/棕灰色组（默认） */
+        .filter-option[data-type="3d-to-3d"] .count,
+        .filter-option[data-type="json"] .count,
+        .filter-option[data-type="llm"] .count,
+        .filter-option[data-type="speech-to-speech"] .count,
+        .filter-option[data-type="speech-to-text"] .count {
+            background: #f5f5f7; /* 浅灰色 */
+        }
+
+        .filter-option.active .count {
+            background: rgba(0, 122, 255, 0.15);
+            color: var(--rh-primary);
+        }
+
+        .toggle-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--rh-text);
+            padding: 8px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .toggle-switch input[type="radio"] {
+            display: none;
+        }
+
+        .toggle-slider {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #d1d1d6;
+            border-radius: 12px;
+            transition: background 0.2s ease;
+            flex-shrink: 0;
+            order: 2;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 2px;
+            top: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch input[type="radio"]:checked + .toggle-slider {
+            background: var(--rh-primary);
+        }
+
+        .toggle-switch input[type="radio"]:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+        
+        .toggle-switch span:not(.toggle-slider) {
+            order: 1;
+            flex: 1;
+        }
+
+        /* 搜索区域样式 */
+        .search-section {
+            padding: 24px 0;
+            background: var(--rh-surface);
+            border-bottom: 0.5px solid var(--rh-border);
+            width: 100%;
+        }
+
+        .search-container-wrapper {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 0 32px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--rh-muted);
+            font-size: 16px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 48px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            color: var(--rh-text);
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: var(--rh-muted);
+        }
+
+        .search-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .suggest-label {
+            font-size: 13px;
+            color: var(--rh-muted);
+            margin-right: 4px;
+        }
+
+        .suggestion-tag {
+            padding: 6px 12px;
+            background: var(--rh-surface-2);
+            border: 1px solid var(--rh-border);
+            border-radius: 16px;
+            font-size: 13px;
+            color: var(--rh-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-tag:hover {
+            background: var(--rh-surface);
+            border-color: var(--rh-primary);
+            color: var(--rh-primary);
+        }
+
+        .model-groups {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .model-group-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--rh-surface-2);
+            border: 1px solid var(--rh-border);
+            border-radius: 16px;
+            font-size: 13px;
+            color: var(--rh-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .model-group-tag:hover {
+            background: var(--rh-surface);
+            border-color: var(--rh-primary);
+            color: var(--rh-primary);
+        }
+
+        .model-group-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .model-group-icon.google-icon {
+            width: 16px;
+            height: 16px;
+            font-size: 12px;
+        }
+
+        .models-content {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .models-grid-all {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            visibility: visible !important;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        @media (min-width: 1600px) {
+            .models-grid-all {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1200px) and (max-width: 1599px) {
+            .models-grid-all {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 1199px) and (min-width: 768px) {
+            .models-grid-all {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .models-grid-all {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 16px;
+            }
+        }
+        
+        /* 响应式布局 */
+        @media (max-width: 1200px) {
+            .main-content-wrapper {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .filter-sidebar {
+                width: 100%;
+            }
+            
+            .filter-container {
+                position: relative;
+                top: auto;
+            }
+        }
+
+        .page-header-content {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .page-header {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: none;
+            color: var(--rh-text);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--rh-surface-2);
+            color: var(--rh-primary);
+        }
+
+        .back-btn i {
+            font-size: 14px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--rh-text);
+            letter-spacing: -0.003em;
+            margin: 0;
+        }
+
+        @media (min-width: 1200px) and (max-width: 1599px) {
+            .models-grid-all {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 1199px) and (min-width: 768px) {
+            .models-grid-all {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .models-grid-all {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 16px;
+            }
+        }
+        
+        /* 同步standard-models的卡片样式 - 使用!important确保优先级 */
+        .all-ai-apps-page .model-card {
+            background: var(--rh-surface) !important;
+            border: 0.5px solid var(--rh-border) !important;
+            border-radius: 16px !important;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+            position: relative !important;
+            z-index: 1;
+            min-height: 400px !important;
+        }
+
+        .all-ai-apps-page .card-background {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 0 !important;
+            background: linear-gradient(135deg, #f5f5f7 0%, #e5e5e7 100%) !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+        }
+
+        .all-ai-apps-page .card-background {
+            overflow: hidden !important;
+        }
+
+        .all-ai-apps-page .card-background img,
+        .all-ai-apps-page .card-background video {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+            z-index: 0 !important;
+        }
+
+        .all-ai-apps-page .card-overlay {
+            position: relative !important;
+            z-index: 1 !important;
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important; /* 内容从底部对齐 */
+        }
+
+        .all-ai-apps-page .model-card:hover {
+            transform: translateY(-4px) !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+            border-color: var(--rh-primary) !important;
+        }
+
+        .all-ai-apps-page .card-image {
+            width: 100% !important;
+            aspect-ratio: 16 / 9 !important;
+            position: absolute !important; /* 改为绝对定位，固定在顶部 */
+            top: 0 !important;
+            left: 0 !important;
+            display: flex !important;
+            align-items: flex-start !important;
+            justify-content: space-between !important;
+            color: var(--rh-muted) !important;
+            font-size: 14px !important;
+            overflow: visible !important; /* 改为visible，确保标签和按钮可见 */
+            flex-shrink: 0 !important;
+            background: transparent !important;
+            z-index: 5 !important; /* 确保在card-content之上 */
+        }
+
+        .all-ai-apps-page .free-tag {
+            position: absolute !important;
+            top: 8px !important;
+            left: 8px !important;
+            background: linear-gradient(135deg, #ff3b30, #ff6b6b) !important;
+            color: white !important;
+            padding: 4px 10px !important;
+            border-radius: 12px !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3) !important;
+            z-index: 10 !important; /* 提高z-index确保在顶部 */
+        }
+
+        .all-ai-apps-page .favorite-btn {
+            position: absolute !important;
+            top: 8px !important;
+            right: 8px !important;
+            background: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 0.5px solid var(--rh-border) !important;
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            color: var(--rh-muted) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+            z-index: 10 !important; /* 提高z-index确保在顶部 */
+        }
+
+        .all-ai-apps-page .favorite-btn:hover {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-color: var(--rh-border) !important;
+            color: var(--rh-muted) !important;
+            transform: scale(1.05) !important;
+        }
+
+        .all-ai-apps-page .favorite-btn.favorited {
+            background: rgba(255, 59, 48, 0.9) !important;
+            border-color: #ff3b30 !important;
+            color: #ffffff !important;
+            transform: scale(1.05) !important;
+        }
+
+        .all-ai-apps-page .favorite-btn.favorited:hover {
+            background: rgba(255, 59, 48, 1) !important;
+            transform: scale(1.1) !important;
+        }
+
+        .all-ai-apps-page .card-content {
+            padding: 12px 18px !important; /* 减少上下padding */
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(6px) !important;
+            -webkit-backdrop-filter: blur(6px) !important;
+            height: auto !important; /* 使用auto高度 */
+            min-height: 140px !important; /* 增加最小高度，确保能显示所有必需内容 */
+            max-height: 150px !important; /* 使用固定高度而不是百分比，确保内容可见 */
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+        }
+
+        .all-ai-apps-page .model-card:hover .card-content {
+            max-height: 100% !important; /* hover时展开到100% */
+        }
+
+        .all-ai-apps-page .api-name {
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            color: #ffffff !important;
+            margin-bottom: 0 !important; /* 减少底部间距 */
+            margin-top: 4px !important; /* 增加顶部间距 */
+            line-height: 1.3 !important; /* 减少行高，更紧凑 */
+            flex-shrink: 0 !important; /* 防止被压缩 */
+        }
+
+        .all-ai-apps-page .category-tag {
+            display: inline-block !important;
+            background: rgba(0, 122, 255, 0.1) !important;
+            color: var(--rh-primary) !important;
+            padding: 4px 10px !important;
+            border-radius: 12px !important;
+            font-size: 11px !important;
+            font-weight: 500 !important;
+            margin-bottom: 10px !important;
+            opacity: 0 !important; /* 默认隐藏 */
+            max-height: 0 !important; /* 默认高度为0 */
+            overflow: hidden !important;
+        }
+
+        .all-ai-apps-page .model-card:hover .category-tag {
+            opacity: 1 !important; /* hover时显示 */
+            max-height: 50px !important; /* hover时展开 */
+            margin-bottom: 10px !important;
+        }
+
+        .all-ai-apps-page .description {
+            font-size: 13px !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+            line-height: 1.5 !important;
+            margin-bottom: 14px !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            opacity: 0 !important; /* 默认隐藏 */
+            max-height: 0 !important; /* 默认高度为0 */
+        }
+
+        .all-ai-apps-page .model-card:hover .description {
+            opacity: 1 !important; /* hover时显示 */
+            max-height: 60px !important; /* hover时展开 */
+            margin-bottom: 14px !important;
+        }
+
+        .all-ai-apps-page .price-row {
+            margin: 6px 0 !important; /* 减少间距 */
+            padding: 0 !important;
+            font-size: 13px !important;
+            line-height: 1.4 !important; /* 减少行高，更紧凑 */
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .all-ai-apps-page .price-row .price {
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: #ff3b30 !important;
+        }
+
+        .all-ai-apps-page .footer-info {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 8px !important; /* 减少间距 */
+            padding-bottom: 8px !important; /* 减少间距 */
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1) !important;
+            font-size: 12px !important;
+            line-height: 1.4 !important; /* 增加行高 */
+        }
+
+        .all-ai-apps-page .run-count {
+            color: #ff3b30 !important;
+            font-weight: 500 !important;
+        }
+
+        .all-ai-apps-page .source {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-weight: 400 !important;
+        }
+    </style>
+</head>
+<body class="standard-models-page all-ai-apps-page">
+    <!-- 顶部导航栏 -->
+    <header class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <span class="logo-icon">R</span> RunningHUB
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="dropdown-wrapper">
+                    <button class="nav-btn primary dropdown-btn" data-dropdown="sdk">
+                        其他SDK下载
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="sdk-dropdown">
+                        <a href="https://github.com/HM-RunningHub" target="_blank" class="dropdown-item">Github</a>
+                        <a href="https://github.com/HM-RunningHub/RH_CozeSDK" target="_blank" class="dropdown-item">Coze SDK</a>
+                        <a href="https://github.com/HM-RunningHub/ComfyUI_RH_APICall" target="_blank" class="dropdown-item">ComfyUI插件</a>
+                        <a href="https://github.com/zombieyang/sd-ppp" target="_blank" class="dropdown-item">SD-PPP</a>
+                    </div>
+                </div>
+                <button class="nav-btn primary" onclick="window.location.href='admin.html'">
+                    进入控制台
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div class="header-icons">
+                    <button class="nav-btn" title="联系">
+                        <i class="fas fa-headset"></i>
+                    </button>
+                    <button class="nav-btn" title="通知">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="nav-btn" title="黄钻">
+                        <i class="fas fa-gem"></i>
+                    </button>
+                    <button class="nav-btn" title="用户中心">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面标题栏 -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-chevron-left"></i>
+                <span>返回</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 搜索区域 -->
+    <section class="search-section">
+        <div class="search-container-wrapper">
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="按应用、任务、类别等进行搜索" id="searchInput">
+                </div>
+                <div class="search-suggestions">
+                    <span class="suggest-label">Try:</span>
+                    <button class="suggestion-tag">Newest image to video models</button>
+                    <button class="suggestion-tag">Flux Kontext</button>
+                    <button class="suggestion-tag">Generate 3D model</button>
+                    <button class="suggestion-tag">Create music</button>
+                    <button class="suggestion-tag">Remove background</button>
+                    <button class="suggestion-tag">Upscale</button>
+                    <button class="suggestion-tag">Training</button>
+                    <button class="suggestion-tag">Try on clothing</button>
+                </div>
+                <div class="model-groups">
+                    <span class="suggest-label">Model groups:</span>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">⚙</span>
+                        <span>OpenAI Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">◆</span>
+                        <span>Wan 2.5 Video Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">📊</span>
+                        <span>Seedream AI Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">W</span>
+                        <span>Wan 2.2 Video Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">✈</span>
+                        <span>Dreamina AI Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">📊</span>
+                        <span>Seedance Video Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">▲</span>
+                        <span>Flux Image Tools</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">🌀</span>
+                        <span>Hailuo Video Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">C</span>
+                        <span>Kling Video Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon google-icon" style="background: linear-gradient(135deg, #4285F4 0%, #EA4335 25%, #FBBC05 50%, #4285F4 75%, #34A853 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700;">G</span>
+                        <span>Google Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">▲</span>
+                        <span>Flux Kontext Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">R</span>
+                        <span>Runwayml AI Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">W</span>
+                        <span>Wan 2.1 Video Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">☯</span>
+                        <span>Hunyuan Video Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">V</span>
+                        <span>Vidu Video Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">❄</span>
+                        <span>Ideogram Image Models</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">R</span>
+                        <span>Recraft Image</span>
+                    </button>
+                    <button class="model-group-tag">
+                        <span class="model-group-icon">P</span>
+                        <span>Pixverse AI Models</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主内容区域 -->
+    <div class="main-content-wrapper">
+        <!-- 左侧筛选区域 -->
+        <aside class="filter-sidebar">
+            <div class="filter-container">
+                <div class="filter-header">
+                    <h3 class="filter-title">筛选</h3>
+                    <button class="clear-filter-btn" id="clearFilterBtn" title="清除所有筛选">
+                        <i class="fas fa-times"></i>
+                        <span>清除</span>
+                    </button>
+                </div>
+                
+                <!-- 任务类型 -->
+                <div class="filter-group">
+                    <div class="filter-options" id="taskTypeFilters">
+                        <!-- 将通过 JavaScript 动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 模型归属 -->
+                <div class="filter-group">
+                    <div class="toggle-group">
+                        <label class="toggle-switch">
+                            <input type="radio" name="modelType" id="ownModels" value="own">
+                            <span class="toggle-slider"></span>
+                            <span>自有模型</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="radio" name="modelType" id="thirdPartyModels" value="thirdParty">
+                            <span class="toggle-slider"></span>
+                            <span>三方模型</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 核心内容区域 -->
+        <div class="models-content">
+            <div class="models-grid-all" id="modelsGrid">
+                <!-- 模型卡片将通过 JavaScript 动态加载 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="api-data.js"></script>
+    <script>
+        // 在加载 standard-models.js 之前，设置一个标记，防止它自动初始化 standard-models.html 的逻辑
+        window._isAllAiAppsPage = true;
+    </script>
+    <script src="standard-models.js"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('all-ai-apps.html DOMContentLoaded');
+            
+            // 确保standard-models.js的数据已加载
+            // standard-models.js会在DOMContentLoaded时自动执行initializePage()和loadDynamicData()
+            // 我们需要等待数据加载完成
+            
+            function tryInitialize() {
+                console.log('尝试初始化，检查数据...');
+                
+                if (window._allApisData && Array.isArray(window._allApisData) && window._allApisData.length > 0) {
+                    // 数据已加载，直接初始化
+                    console.log('数据已存在，直接初始化');
+                    initializeAllAiAppsPage();
+                } else if (typeof loadDynamicData === 'function') {
+                    // 如果数据还没加载，主动调用
+                    console.log('调用 loadDynamicData');
+                    loadDynamicData();
+                    // 等待数据加载
+                    setTimeout(() => {
+                        if (window._allApisData && Array.isArray(window._allApisData) && window._allApisData.length > 0) {
+                            console.log('数据加载完成，初始化页面');
+                            initializeAllAiAppsPage();
+                        } else {
+                            // 如果还是没数据，延迟再试
+                            console.log('数据仍未加载，延迟重试');
+                            setTimeout(tryInitialize, 300);
+                        }
+                    }, 300);
+                } else {
+                    // 如果loadDynamicData函数不存在，延迟再试
+                    console.log('loadDynamicData 函数不存在，延迟重试');
+                    setTimeout(tryInitialize, 300);
+                }
+            }
+            
+            // 延迟一点开始尝试初始化，确保 standard-models.js 已经执行
+            setTimeout(() => {
+                tryInitialize();
+            }, 100);
+        });
+
+        function initializeAllAiAppsPage() {
+            console.log('初始化 all-ai-apps 页面');
+            
+            // 返回按钮点击事件（立即绑定，不依赖数据加载）
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) {
+                // 移除可能存在的旧事件监听器
+                const newBackBtn = backBtn.cloneNode(true);
+                backBtn.parentNode.replaceChild(newBackBtn, backBtn);
+                
+                // 绑定新的事件
+                newBackBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('点击返回按钮');
+                    // 返回到上一页
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        window.location.href = 'ai-apps-detail.html';
+                    }
+                });
+            }
+            
+            // 加载并显示所有模型
+            loadAllModels();
+            
+            // 添加下拉菜单交互
+            addDropdownInteractions();
+            
+            // 添加搜索功能
+            addSearchFunctionality();
+            
+            // 添加筛选功能
+            addFilterFunctionality();
+        }
+        
+        // 初始化筛选选项
+        function initializeFilters() {
+            const allApis = window._allApisData || [];
+            
+            // 获取所有任务类型并统计数量
+            const taskTypeCounts = {};
+            allApis.forEach(api => {
+                const taskType = api.taskType || '未知';
+                taskTypeCounts[taskType] = (taskTypeCounts[taskType] || 0) + 1;
+            });
+            
+            // 任务类型映射（从 data-type 到显示名称）- 包含所有20个任务类型
+            const taskTypeMap = {
+                '3d-to-3d': '3D to 3D',
+                'audio-to-audio': 'Audio to Audio',
+                'audio-to-video': 'Audio to Video',
+                'image-to-3d': 'Image to 3D',
+                'image-to-image': 'Image to Image',
+                'image-to-json': 'Image to JSON',
+                'image-to-video': 'Image to Video',
+                'json': 'JSON',
+                'llm': 'Large Language Models',
+                'speech-to-speech': 'Speech to Speech',
+                'speech-to-text': 'Speech to Text',
+                'text-to-3d': 'Text to 3D',
+                'text-to-audio': 'Text to Audio',
+                'text-to-image': 'Text to Image',
+                'text-to-speech': 'Text to Speech',
+                'text-to-video': 'Text to Video',
+                'training': 'Training',
+                'video-to-audio': 'Video to Audio',
+                'video-to-video': 'Video to Video',
+                'vision': 'Vision'
+            };
+            
+            // 创建任务类型筛选选项 - 显示所有任务类型，无论是否有数据
+            const taskTypeFilters = document.getElementById('taskTypeFilters');
+            if (taskTypeFilters) {
+                // 按任务类型名称排序（按字母顺序，不按数量）
+                const sortedTaskTypes = Object.keys(taskTypeMap).sort((a, b) => {
+                    const nameA = taskTypeMap[a];
+                    const nameB = taskTypeMap[b];
+                    return nameA.localeCompare(nameB);
+                });
+                
+                // 生成所有任务类型选项（即使数量为0也显示）
+                taskTypeFilters.innerHTML = sortedTaskTypes.map(type => {
+                    const displayName = taskTypeMap[type];
+                    const count = taskTypeCounts[displayName] || 0;
+                    return `
+                        <label class="filter-option" data-type="${type}" data-task-type="${displayName}">
+                            <input type="checkbox" class="filter-checkbox-input" style="display: none;">
+                            <span class="filter-checkbox"></span>
+                            <span class="filter-option-label">
+                                <span class="filter-option-text">${displayName}</span>
+                                <span class="count">${count}</span>
+                            </span>
+                        </label>
+                    `;
+                }).join('');
+                
+                // 初始化完成后，根据模型归属更新任务类型列表（但显示所有，只更新数量）
+                updateTaskTypeFiltersByModelType();
+            }
+        }
+        
+        // 添加搜索功能
+        function addSearchFunctionality() {
+            const searchInput = document.getElementById('searchInput');
+            const suggestionTags = document.querySelectorAll('.suggestion-tag');
+            
+            // 检查URL参数，如果有搜索关键词则自动填充并搜索
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('q');
+            if (searchQuery && searchInput) {
+                searchInput.value = decodeURIComponent(searchQuery);
+                // 自动触发搜索
+                performSearch(searchInput.value.trim());
+                // 搜索框自动获得焦点
+                setTimeout(() => {
+                    searchInput.focus();
+                }, 100);
+            } else if (searchInput) {
+                // 如果没有搜索关键词，搜索框自动获得焦点
+                setTimeout(() => {
+                    searchInput.focus();
+                }, 100);
+            }
+            
+            // 搜索输入
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    const query = this.value.trim();
+                    
+                    if (query.length > 0) {
+                        searchTimeout = setTimeout(() => {
+                            performSearch(query);
+                        }, 300);
+                    } else {
+                        applyFilters();
+                    }
+                });
+            }
+            
+            // 建议标签点击
+            const suggestionTags = document.querySelectorAll('.suggestion-tag');
+            suggestionTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const query = this.textContent.trim();
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.value = query;
+                        performSearch(query);
+                    }
+                });
+            });
+        }
+        
+        // 执行搜索
+        function performSearch(query) {
+            const allApis = window._allApisData || [];
+            const filtered = searchApis(allApis, query);
+            renderModels(filtered);
+        }
+        
+        // 搜索API
+        function searchApis(apis, query) {
+            if (!query) return apis;
+            
+            const lowerQuery = query.toLowerCase();
+            return apis.filter(api => {
+                const nameMatch = api.name?.toLowerCase().includes(lowerQuery);
+                const descMatch = api.description?.toLowerCase().includes(lowerQuery);
+                const taskTypeMatch = api.taskType?.toLowerCase().includes(lowerQuery);
+                const categoryMatch = api.functionCategory?.toLowerCase().includes(lowerQuery);
+                return nameMatch || descMatch || taskTypeMatch || categoryMatch;
+            });
+        }
+        
+        // 添加筛选功能
+        function addFilterFunctionality() {
+            // 任务类型筛选（多选 - 复选框）
+            const taskTypeFilters = document.getElementById('taskTypeFilters');
+            if (taskTypeFilters) {
+                taskTypeFilters.addEventListener('click', function(e) {
+                    const option = e.target.closest('.filter-option');
+                    if (option) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        option.classList.toggle('active');
+                        updateClearButton();
+                        applyFilters();
+                        updateTaskTypeFiltersByModelType();
+                    }
+                });
+            }
+            
+            // 模型归属筛选（切换开关）- 可以打开/关闭，同时只能开一个，也可以都不开
+            const ownModelsRadio = document.getElementById('ownModels');
+            const thirdPartyModelsRadio = document.getElementById('thirdPartyModels');
+            
+            // 处理模型归属切换的函数
+            function handleModelTypeToggle(clickedRadio, otherRadio) {
+                // 更新任务类型筛选列表（只显示当前模型归属下的任务类型）
+                updateTaskTypeFiltersByModelType();
+                // 清除已选中的任务类型（因为模型归属已改变）
+                clearTaskTypeSelections();
+                applyFilters();
+                updateClearButton();
+            }
+            
+            // 处理自有模型开关点击
+            if (ownModelsRadio) {
+                const ownModelsLabel = ownModelsRadio.closest('.toggle-switch');
+                
+                // 在label上监听点击（覆盖整个toggle switch区域）
+                if (ownModelsLabel) {
+                    ownModelsLabel.addEventListener('click', function(e) {
+                        // 阻止默认行为，手动控制
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // 如果当前已选中，则取消选中（可以都不选）
+                        if (ownModelsRadio.checked) {
+                            ownModelsRadio.checked = false;
+                        } else {
+                            // 如果未选中，则选中它并取消另一个（只能选一个）
+                            ownModelsRadio.checked = true;
+                            if (thirdPartyModelsRadio) {
+                                thirdPartyModelsRadio.checked = false;
+                            }
+                        }
+                        
+                        handleModelTypeToggle(ownModelsRadio, thirdPartyModelsRadio);
+                    });
+                }
+                
+                // 在radio按钮本身监听mousedown（在浏览器改变状态之前拦截）
+                ownModelsRadio.addEventListener('mousedown', function(e) {
+                    // 保存当前状态
+                    const wasChecked = this.checked;
+                    
+                    // 阻止默认行为
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 根据之前的状态切换
+                    if (wasChecked) {
+                        // 如果之前是选中，则取消选中
+                        this.checked = false;
+                    } else {
+                        // 如果之前是未选中，则选中它并取消另一个
+                        this.checked = true;
+                        if (thirdPartyModelsRadio) {
+                            thirdPartyModelsRadio.checked = false;
+                        }
+                    }
+                    
+                    handleModelTypeToggle(this, thirdPartyModelsRadio);
+                });
+            }
+            
+            // 处理三方模型开关点击
+            if (thirdPartyModelsRadio) {
+                const thirdPartyModelsLabel = thirdPartyModelsRadio.closest('.toggle-switch');
+                
+                // 在label上监听点击（覆盖整个toggle switch区域）
+                if (thirdPartyModelsLabel) {
+                    thirdPartyModelsLabel.addEventListener('click', function(e) {
+                        // 阻止默认行为，手动控制
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // 如果当前已选中，则取消选中（可以都不选）
+                        if (thirdPartyModelsRadio.checked) {
+                            thirdPartyModelsRadio.checked = false;
+                        } else {
+                            // 如果未选中，则选中它并取消另一个（只能选一个）
+                            thirdPartyModelsRadio.checked = true;
+                            if (ownModelsRadio) {
+                                ownModelsRadio.checked = false;
+                            }
+                        }
+                        
+                        handleModelTypeToggle(thirdPartyModelsRadio, ownModelsRadio);
+                    });
+                }
+                
+                // 在radio按钮本身监听mousedown（在浏览器改变状态之前拦截）
+                thirdPartyModelsRadio.addEventListener('mousedown', function(e) {
+                    // 保存当前状态
+                    const wasChecked = this.checked;
+                    
+                    // 阻止默认行为
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 根据之前的状态切换
+                    if (wasChecked) {
+                        // 如果之前是选中，则取消选中
+                        this.checked = false;
+                    } else {
+                        // 如果之前是未选中，则选中它并取消另一个
+                        this.checked = true;
+                        if (ownModelsRadio) {
+                            ownModelsRadio.checked = false;
+                        }
+                    }
+                    
+                    handleModelTypeToggle(this, ownModelsRadio);
+                });
+            }
+            
+            // 清除按钮
+            const clearBtn = document.getElementById('clearFilterBtn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    clearAllFilters();
+                });
+            }
+            
+            // 初始更新清除按钮状态
+            updateClearButton();
+        }
+        
+        // 根据模型归属更新任务类型筛选列表
+        function updateTaskTypeFiltersByModelType() {
+            const allApis = window._allApisData || [];
+            const ownModelsChecked = document.getElementById('ownModels')?.checked;
+            const thirdPartyModelsChecked = document.getElementById('thirdPartyModels')?.checked;
+            
+            // 根据模型归属筛选API
+            let filteredApis = allApis;
+            if (ownModelsChecked) {
+                filteredApis = filteredApis.filter(api => api.modelType === 'own');
+            } else if (thirdPartyModelsChecked) {
+                filteredApis = filteredApis.filter(api => api.modelType === 'thirdParty');
+            }
+            
+            // 统计当前模型归属下的任务类型数量
+            const taskTypeCounts = {};
+            filteredApis.forEach(api => {
+                const taskType = api.taskType || '未知';
+                taskTypeCounts[taskType] = (taskTypeCounts[taskType] || 0) + 1;
+            });
+            
+            // 更新任务类型筛选选项的数量（始终显示所有选项，只更新数量）
+            document.querySelectorAll('.filter-option').forEach(option => {
+                const taskType = option.dataset.taskType;
+                const count = taskTypeCounts[taskType] || 0;
+                const countSpan = option.querySelector('.count');
+                
+                // 始终显示该任务类型选项，只更新数量
+                option.style.display = 'flex';
+                if (countSpan) {
+                    countSpan.textContent = count;
+                }
+            });
+        }
+        
+        // 清除任务类型选择
+        function clearTaskTypeSelections() {
+            document.querySelectorAll('.filter-option.active').forEach(option => {
+                option.classList.remove('active');
+            });
+        }
+        
+        // 清除所有筛选
+        function clearAllFilters() {
+            // 清除任务类型选择
+            clearTaskTypeSelections();
+            
+            // 清除模型归属选择
+            const ownModelsRadio = document.getElementById('ownModels');
+            const thirdPartyModelsRadio = document.getElementById('thirdPartyModels');
+            if (ownModelsRadio) {
+                ownModelsRadio.checked = false;
+            }
+            if (thirdPartyModelsRadio) {
+                thirdPartyModelsRadio.checked = false;
+            }
+            
+            // 清除搜索
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            
+            // 更新任务类型筛选列表（显示所有任务类型）
+            updateTaskTypeFiltersByModelType();
+            
+            // 应用筛选（显示所有模型）
+            applyFilters();
+            
+            // 更新清除按钮
+            updateClearButton();
+        }
+        
+        // 更新清除按钮显示状态
+        function updateClearButton() {
+            const clearBtn = document.getElementById('clearFilterBtn');
+            if (!clearBtn) return;
+            
+            // 检查是否有任何筛选被选中
+            const hasActiveTaskType = document.querySelectorAll('.filter-option.active').length > 0;
+            const ownModelsChecked = document.getElementById('ownModels')?.checked;
+            const thirdPartyModelsChecked = document.getElementById('thirdPartyModels')?.checked;
+            const hasSearch = document.getElementById('searchInput')?.value.trim() || '';
+            
+            if (hasActiveTaskType || ownModelsChecked || thirdPartyModelsChecked || hasSearch) {
+                clearBtn.classList.add('show');
+            } else {
+                clearBtn.classList.remove('show');
+            }
+        }
+        
+        // 应用筛选
+        function applyFilters() {
+            const allApis = window._allApisData || [];
+            let filtered = [...allApis];
+            
+            // 任务类型筛选（多选 - 复选框）
+            const activeTaskTypes = Array.from(document.querySelectorAll('.filter-option.active'))
+                .map(option => option.dataset.taskType)
+                .filter(type => type); // 过滤掉空值
+            
+            if (activeTaskTypes.length > 0) {
+                filtered = filtered.filter(api => activeTaskTypes.includes(api.taskType));
+            }
+            
+            // 模型归属筛选（单选）
+            const ownModelsChecked = document.getElementById('ownModels')?.checked;
+            const thirdPartyModelsChecked = document.getElementById('thirdPartyModels')?.checked;
+            
+            if (ownModelsChecked) {
+                filtered = filtered.filter(api => api.modelType === 'own');
+            } else if (thirdPartyModelsChecked) {
+                filtered = filtered.filter(api => api.modelType === 'thirdParty');
+            }
+            
+            // 搜索筛选
+            const searchInput = document.getElementById('searchInput');
+            const hasSearch = searchInput && searchInput.value.trim();
+            if (hasSearch) {
+                filtered = searchApis(filtered, searchInput.value.trim());
+            }
+            
+            // 渲染筛选结果
+            renderModels(filtered);
+            
+            // 更新任务类型数量（基于当前筛选结果，如果没有筛选则基于所有模型）
+            const hasActiveTaskType = activeTaskTypes.length > 0;
+            
+            if (!hasActiveTaskType && !ownModelsChecked && !thirdPartyModelsChecked && !hasSearch) {
+                // 没有任何筛选时，基于所有模型更新计数
+                updateFilterCounts(allApis);
+            } else {
+                // 有筛选时，基于筛选结果更新计数
+                updateFilterCounts(filtered);
+            }
+            
+            // 更新清除按钮状态
+            updateClearButton();
+        }
+        
+        // 更新筛选选项的数量
+        function updateFilterCounts(filteredApis) {
+            const taskTypeCounts = {};
+            filteredApis.forEach(api => {
+                const taskType = api.taskType || '未知';
+                taskTypeCounts[taskType] = (taskTypeCounts[taskType] || 0) + 1;
+            });
+            
+            document.querySelectorAll('.filter-option').forEach(option => {
+                const taskType = option.dataset.taskType;
+                const count = taskTypeCounts[taskType] || 0;
+                const countSpan = option.querySelector('.count');
+                if (countSpan) {
+                    countSpan.textContent = count;
+                }
+            });
+        }
+        
+        // 添加下拉菜单交互
+        function addDropdownInteractions() {
+            const dropdownBtns = document.querySelectorAll('.dropdown-btn');
+            
+            dropdownBtns.forEach(btn => {
+                const dropdownId = btn.getAttribute('data-dropdown');
+                const menu = document.getElementById(`${dropdownId}-dropdown`);
+                
+                if (!menu) return;
+                
+                // 鼠标悬停显示
+                btn.addEventListener('mouseenter', () => {
+                    menu.style.display = 'block';
+                });
+                
+                // 离开按钮或菜单时隐藏
+                btn.addEventListener('mouseleave', () => {
+                    setTimeout(() => {
+                        if (!menu.matches(':hover') && !btn.matches(':hover')) {
+                            menu.style.display = 'none';
+                        }
+                    }, 100);
+                });
+                
+                menu.addEventListener('mouseleave', () => {
+                    menu.style.display = 'none';
+                });
+            });
+        }
+
+        // AI应用详情页面的模型卡片数据（从 ai-apps-detail.html 中提取）
+        const aiAppsDetailModels = {
+            '普通AI应用': [
+                { name: '万物高清放大(分块)seedVR2', taskType: 'Image to Image', description: '支持分块处理的高清图像放大模型，使用seedVR2技术', runCount: 18000, source: { channelName: '官方' } },
+                { name: 'Viduq2 多张参考生视频(角色一致性)', taskType: 'Image to Video', description: '支持多张参考图生成视频，保持角色一致性', runCount: 15000, source: { channelName: '官方' } },
+                { name: 'RH Veo3.1 Image2Video', taskType: 'Image to Video', description: '基于Veo 3.1的图像转视频模型', runCount: 32000, source: { channelName: '官方' } },
+                { name: '即梦AI-图生视频3.0 PRO', taskType: 'Image to Video', description: '即梦AI最新版本的图生视频模型', runCount: 8500, source: { channelName: '官方' } },
+                { name: 'Qwen ——影视剧情分镜制作（ai短剧）', taskType: 'Text to Video', description: '专为影视分镜和短剧制作设计的AI模型', runCount: 12000, source: { channelName: '官方' } },
+                { name: 'Qwen文生图-卡通，国风，游戏，渲染人物风格加强', taskType: 'Text to Image', description: '支持多种风格的文生图模型', runCount: 28000, source: { channelName: '官方' } },
+                { name: 'Q版打工人表情包', taskType: 'Text to Image', description: '生成Q版打工人风格的表情包', runCount: 5600, source: { channelName: '官方' } }
+            ],
+            '快捷创作': [
+                { name: 'Nano', taskType: 'Text to Image', description: '快速图像生成模型', runCount: 45000, source: { channelName: '官方' } },
+                { name: 'Sor02 文生视频', taskType: 'Text to Video', description: 'Sora 2文本生成视频模型', runCount: 38000, source: { channelName: '官方' } },
+                { name: 'Sor02 图生视频', taskType: 'Image to Video', description: 'Sora 2图像生成视频模型', runCount: 35000, source: { channelName: '官方' } },
+                { name: 'WAN2.2 文生视频', taskType: 'Text to Video', description: 'WAN 2.2文本生成视频模型', runCount: 22000, source: { channelName: '官方' } },
+                { name: 'WAN2.2 图生视频', taskType: 'Image to Video', description: 'WAN 2.2图像生成视频模型', runCount: 18000, source: { channelName: '官方' } },
+                { name: 'Flux 文生图', taskType: 'Text to Image', description: 'Flux文本生成图像模型', runCount: 52000, source: { channelName: '官方' } },
+                { name: 'Qwen 文生图', taskType: 'Text to Image', description: 'Qwen文本生成图像模型', runCount: 31000, source: { channelName: '官方' } },
+                { name: '参考生图-P图', taskType: 'Image to Image', description: '基于参考图的图像编辑和生成', runCount: 14000, source: { channelName: '官方' } }
+            ],
+            '模型创作': [
+                { name: 'qwen_image_fp8_e4m3fn', taskType: 'Text to Image', description: 'Qwen图像生成模型FP8优化版本', runCount: 8900, source: { channelName: '官方' } },
+                { name: 'daouoomeu_xusnxu', taskType: 'Text to Image', description: '专业图像生成模型', runCount: 7200, source: { channelName: '官方' } },
+                { name: 'WAN2.2', taskType: 'Text to Video', description: 'WAN 2.2视频生成模型', runCount: 25000, source: { channelName: '官方' } }
+            ]
+        };
+        
+        // 获取所有AI应用模型名称列表
+        function getAllAiAppsModelNames() {
+            const names = [];
+            Object.values(aiAppsDetailModels).forEach(category => {
+                category.forEach(model => {
+                    if (model.name) {
+                        names.push(model.name);
+                    }
+                });
+            });
+            return names;
+        }
+        
+        // 将本地AI应用数据转换为标准格式，并尝试从 window._allApisData 中补充完整信息
+        function convertLocalAiAppsToStandardFormat() {
+            const allAiApps = [];
+            let idCounter = 10000; // 从10000开始，避免与 window._allApisData 中的ID冲突
+            
+            Object.values(aiAppsDetailModels).forEach(category => {
+                category.forEach(model => {
+                    // 尝试从 window._allApisData 中找到匹配的模型，获取完整信息
+                    let matchedModel = null;
+                    if (window._allApisData && Array.isArray(window._allApisData)) {
+                        matchedModel = window._allApisData.find(api => {
+                            const apiName = (api.name || '').trim();
+                            const modelName = (model.name || '').trim();
+                            return apiName === modelName || 
+                                   apiName.includes(modelName) || 
+                                   modelName.includes(apiName);
+                        });
+                    }
+                    
+                    // 合并数据：优先使用 window._allApisData 中的完整信息，本地数据作为补充
+                    const standardModel = {
+                        id: matchedModel?.id || idCounter++,
+                        name: model.name,
+                        description: matchedModel?.description || model.description || '',
+                        taskType: matchedModel?.taskType || model.taskType || '',
+                        runCount: matchedModel?.runCount || model.runCount || 0,
+                        source: matchedModel?.source || model.source || { channelName: '官方' },
+                        pricing: matchedModel?.pricing || null,
+                        modelType: matchedModel?.modelType || 'own',
+                        functionCategory: matchedModel?.functionCategory || '',
+                        categoryTitle: matchedModel?.categoryTitle || '',
+                        status: matchedModel?.status || 'active',
+                        freeTag: matchedModel?.freeTag || { enabled: false, count: 0 },
+                        image: matchedModel?.image || null,
+                        regions: matchedModel?.regions || ['domestic', 'international']
+                    };
+                    
+                    allAiApps.push(standardModel);
+                });
+            });
+            
+            return allAiApps;
+        }
+        
+        // 筛选AI应用模型（从 window._allApisData 中）
+        function filterAiAppsModels(allModels) {
+            if (!allModels || allModels.length === 0) {
+                return [];
+            }
+            
+            const aiAppsModelNames = getAllAiAppsModelNames();
+            
+            return allModels.filter(model => {
+                const modelName = (model.name || '').trim();
+                if (!modelName) return false;
+                
+                // 检查模型名称是否在AI应用列表中
+                return aiAppsModelNames.some(aiAppName => {
+                    const normalizedAiAppName = aiAppName.trim();
+                    const normalizedModelName = modelName.trim();
+                    
+                    // 精确匹配
+                    if (normalizedModelName === normalizedAiAppName) {
+                        return true;
+                    }
+                    
+                    // 部分匹配（处理名称变体）
+                    if (normalizedModelName.includes(normalizedAiAppName) || 
+                        normalizedAiAppName.includes(normalizedModelName)) {
+                        return true;
+                    }
+                    
+                    // 处理一些常见的变体（大小写不敏感）
+                    const modelNameLower = normalizedModelName.toLowerCase();
+                    const aiAppNameLower = normalizedAiAppName.toLowerCase();
+                    if (modelNameLower.includes(aiAppNameLower) || 
+                        aiAppNameLower.includes(modelNameLower)) {
+                        return true;
+                    }
+                    
+                    return false;
+                });
+            });
+        }
+        
+        // 获取AI应用模型（直接使用 ai-apps-detail.html 中定义的本地数据）
+        function getAiAppsModels() {
+            // 直接使用本地定义的 aiAppsDetailModels 数据
+            const localModels = convertLocalAiAppsToStandardFormat();
+            console.log('使用本地AI应用数据，模型数:', localModels.length);
+            
+            // 尝试从 window._allApisData 中补充完整信息（如价格等）
+            if (window._allApisData && Array.isArray(window._allApisData)) {
+                localModels.forEach(localModel => {
+                    const matchedModel = window._allApisData.find(api => {
+                        const apiName = (api.name || '').trim();
+                        const modelName = (localModel.name || '').trim();
+                        return apiName === modelName || 
+                               apiName.includes(modelName) || 
+                               modelName.includes(apiName);
+                    });
+                    
+                    // 如果找到匹配的模型，补充完整信息
+                    if (matchedModel) {
+                        if (matchedModel.pricing) localModel.pricing = matchedModel.pricing;
+                        if (matchedModel.id) localModel.id = matchedModel.id;
+                        if (matchedModel.functionCategory) localModel.functionCategory = matchedModel.functionCategory;
+                        if (matchedModel.categoryTitle) localModel.categoryTitle = matchedModel.categoryTitle;
+                        if (matchedModel.runCount !== undefined) localModel.runCount = matchedModel.runCount;
+                        if (matchedModel.modelType) localModel.modelType = matchedModel.modelType;
+                    }
+                });
+            }
+            
+            return localModels;
+        }
+
+        function loadAllModels() {
+            console.log('开始加载所有AI应用模型数据');
+            
+            // 直接使用本地定义的 aiAppsDetailModels 数据
+            let aiAppsModels = getAiAppsModels();
+            console.log('获取到的AI应用模型数:', aiAppsModels.length);
+            
+            // 如果 window._allApisData 还未加载，等待一下再尝试补充完整信息
+            if (!window._allApisData || window._allApisData.length === 0) {
+                console.log('window._allApisData 未加载，尝试调用 loadDynamicData');
+                if (typeof loadDynamicData === 'function') {
+                    // 直接调用 loadDynamicData，它会设置 window._allApisData
+                    loadDynamicData();
+                    // 等待一下再获取，以便补充完整信息
+                    setTimeout(() => {
+                        // 重新获取AI应用模型（这次会尝试补充完整信息）
+                        aiAppsModels = getAiAppsModels();
+                        console.log('补充信息后的AI应用模型数:', aiAppsModels.length);
+                        
+                        if (aiAppsModels && aiAppsModels.length > 0) {
+                            // 初始化筛选选项
+                            initializeFilters();
+                            // 渲染所有模型
+                            renderModels(aiAppsModels);
+                            // 更新筛选计数
+                            updateFilterCounts(aiAppsModels);
+                        } else {
+                            // 显示提示信息
+                            const modelsGrid = document.getElementById('modelsGrid');
+                            if (modelsGrid) {
+                                modelsGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--rh-muted);">数据加载失败，请刷新页面重试</div>';
+                            }
+                        }
+                    }, 300);
+                    return;
+                }
+            }
+            
+            console.log('准备渲染，AI应用模型数:', aiAppsModels.length);
+
+            // 渲染所有AI应用模型
+            if (aiAppsModels.length === 0) {
+                console.warn('没有找到AI应用模型数据');
+                // 显示提示信息
+                const modelsGrid = document.getElementById('modelsGrid');
+                if (modelsGrid) {
+                    modelsGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--rh-muted);">正在加载模型数据...</div>';
+                }
+            } else {
+                // 初始化筛选选项
+                initializeFilters();
+                // 渲染所有模型
+                renderModels(aiAppsModels);
+                // 更新筛选计数
+                updateFilterCounts(aiAppsModels);
+            }
+        }
+
+        function renderModels(models) {
+            const modelsGrid = document.getElementById('modelsGrid');
+            if (!modelsGrid) {
+                console.error('找不到 modelsGrid 元素');
+                return;
+            }
+
+            console.log('开始渲染模型，数量:', models.length);
+            
+            // 调试：检查第一个模型的数据结构
+            if (models.length > 0) {
+                console.log('第一个模型数据示例:', {
+                    name: models[0].name,
+                    hasPricing: !!models[0].pricing,
+                    pricing: models[0].pricing,
+                    runCount: models[0].runCount,
+                    modelType: models[0].modelType,
+                    source: models[0].source
+                });
+            }
+
+            if (models.length === 0) {
+                modelsGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--rh-muted);">暂无模型数据</div>';
+                return;
+            }
+
+            try {
+                const cardsHtml = models.map((model, index) => {
+                    try {
+                        return createModelCard(model, index);
+                    } catch (cardError) {
+                        console.error(`创建模型卡片失败 (索引 ${index}):`, cardError, model);
+                        return `<div class="model-card"><div class="card-content"><p>卡片渲染失败: ${model.name || '未知'}</p></div></div>`;
+                    }
+                }).join('');
+                modelsGrid.innerHTML = cardsHtml;
+                console.log('模型卡片渲染完成，共', models.length, '个');
+
+                // 添加卡片点击事件
+                addCardClickEvents();
+            } catch (error) {
+                console.error('渲染模型时出错:', error);
+                modelsGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--rh-muted);">渲染出错，请刷新页面重试</div>';
+            }
+        }
+
+        // 判断模型类型（是否为三方模型API）- 与 ai-apps-detail.html 一致
+        function isThirdPartyModel(model) {
+            // 优先使用 modelType 字段
+            if (model.modelType === 'thirdParty') {
+                return true;
+            }
+            if (model.modelType === 'own') {
+                return false;
+            }
+            // 如果没有 modelType 字段，根据来源判断
+            if (model.source && model.source.channelName) {
+                const channelName = model.source.channelName;
+                return channelName === '三方' || 
+                       channelName === '第三方' ||
+                       (model.name && (model.name.includes('Qwen') || model.name.includes('即梦AI')));
+            }
+            return false;
+        }
+
+        // 格式化数字 - 与 ai-apps-detail.html 一致
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // 创建模型卡片HTML（使用与 ai-apps-detail.html 相同的格式）
+        function createModelCard(model, index) {
+            // 确保 model 存在
+            if (!model) {
+                console.error('createModelCard: model 为空', index);
+                return '<div class="model-card"><div class="card-content"><p>模型数据错误</p></div></div>';
+            }
+            
+            // 安全地获取数据
+            const modelName = model.name || '未知模型';
+            const taskType = model.taskType || '未知';
+            const description = model.description || '暂无描述';
+            const runCount = model.runCount || 0;
+            const modelId = model.id || index || 'unknown';
+            
+            // 根据模型类型设置价格描述
+            let isThirdParty = false;
+            try {
+                isThirdParty = isThirdPartyModel(model);
+            } catch (e) {
+                console.warn('判断模型类型时出错:', e, model);
+                isThirdParty = false;
+            }
+            
+            const priceDisplay = isThirdParty 
+                ? '三方API调用费用+运行时长消耗费用'
+                : '运行时长消耗费用';
+            
+            // 格式化运行次数
+            let runCountFormatted = '0';
+            try {
+                runCountFormatted = formatNumber(runCount);
+            } catch (e) {
+                console.warn('格式化运行次数时出错:', e, runCount);
+                runCountFormatted = String(runCount || 0);
+            }
+            
+            // 获取来源信息
+            let sourceName = '未知';
+            try {
+                if (model.source && model.source.channelName) {
+                    sourceName = model.source.channelName;
+                }
+            } catch (e) {
+                console.warn('获取来源信息时出错:', e, model);
+            }
+            
+            // 根据模型名称生成背景图片路径
+            const backgroundImagePath = 'images/' + String(modelName) + '-bg-0.png';
+            
+            // 构建 HTML（与 ai-apps-detail.html 完全一致）
+            return '<div class="model-card" data-api-id="' + String(modelId) + '" style="cursor: pointer;">' +
+                '<div class="card-background">' +
+                    '<img src="' + backgroundImagePath + '" alt="' + String(modelName) + ' background" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.style.display=\'none\';" onload="this.style.display=\'block\';">' +
+                '</div>' +
+                '<div class="card-overlay">' +
+                    '<div class="card-image">' +
+                        '<button class="favorite-btn"><i class="fas fa-star"></i></button>' +
+                    '</div>' +
+                    '<div class="card-content">' +
+                        '<div class="footer-info">' +
+                            '<span class="run-count">' + String(runCountFormatted) + ' runs</span>' +
+                            '<span class="source">' + String(sourceName) + '</span>' +
+                        '</div>' +
+                        '<div class="price-row">' + String(priceDisplay) + '</div>' +
+                        '<h4 class="api-name">' + String(modelName) + '</h4>' +
+                        '<div class="category-tag">' + String(taskType) + '</div>' +
+                        '<p class="description">' + String(description) + '</p>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        // 本地价格显示生成函数（备用，当全局函数不可用时使用）
+        function generatePriceDisplayLocal(model) {
+            // 兼容：如果传入的是pricing对象
+            const pricing = model.pricing || model;
+            const modelType = model.modelType || null;
+            const source = model.source || null;
+            
+            if (!pricing || !pricing.domestic) {
+                const isThirdParty = modelType === 'thirdParty' || 
+                                   (source && (source.channelName === '三方' || source.channelName === '第三方'));
+                return isThirdParty 
+                    ? '消耗钱包余额,按次计费,<span class="price">价格待定</span>'
+                    : '按次计费,<span class="price">价格待定</span>';
+            }
+            
+            // 默认使用国内价格（￥）
+            const domestic = pricing.domestic;
+            const international = pricing.international;
+            
+            let priceText = '';
+            let unit = '';
+            
+            // 优先使用国内价格
+            if (domestic && domestic.tiers && domestic.tiers.length > 0) {
+                const tier = domestic.tiers[0];
+                priceText = `¥${tier.price}`;
+                unit = domestic.unit || '次';
+            } else if (international && international.tiers && international.tiers.length > 0) {
+                // 如果国内价格不可用，使用国际价格作为备用
+                const tier = international.tiers[0];
+                priceText = `¥${tier.price}`;
+                unit = international.unit || '次';
+            }
+            
+            if (!priceText) {
+                const isThirdParty = modelType === 'thirdParty' || 
+                                   (source && (source.channelName === '三方' || source.channelName === '第三方'));
+                return isThirdParty 
+                    ? '消耗钱包余额,按次计费,<span class="price">价格待定</span>'
+                    : '按次计费,<span class="price">价格待定</span>';
+            }
+            
+            // 判断是否为三方模型API
+            const isThirdParty = modelType === 'thirdParty' || 
+                               (source && (source.channelName === '三方' || source.channelName === '第三方'));
+            
+            // 根据unit生成计费方式描述
+            let billingMethod = '';
+            switch(unit) {
+                case '次':
+                    billingMethod = '按次计费';
+                    break;
+                case '秒':
+                    billingMethod = '按生成视频长度计费';
+                    break;
+                case '张':
+                    billingMethod = '按张计费';
+                    break;
+                case '字符':
+                    billingMethod = '按字符计费';
+                    break;
+                case '小时':
+                    billingMethod = '按小时计费';
+                    break;
+                default:
+                    billingMethod = '按次计费';
+            }
+            
+            // 三方模型API：显示"消耗钱包余额,按次计费,¥XX/次"（固定为按次计费）
+            // 自有模型API：根据unit显示对应的计费方式
+            if (isThirdParty) {
+                return `消耗钱包余额,按次计费,<span class="price">${priceText}/次</span>`;
+            } else {
+                return `${billingMethod},<span class="price">${priceText}/${unit}</span>`;
+            }
+        }
+
+        // 注意：此函数已废弃，应该直接使用 generatePriceDisplayLocal
+        // 保留此函数仅为兼容性，实际在 createModelCard 中已直接调用 generatePriceDisplayLocal
+        function generatePriceDisplay(pricing) {
+            // 直接使用本地实现
+            return generatePriceDisplayLocal({ pricing: pricing });
+        }
+
+        function formatNumber(num) {
+            // 使用 standard-models.js 中的函数，如果存在的话
+            if (typeof window.formatNumber === 'function') {
+                return window.formatNumber(num);
+            }
+            
+            // 备用实现
+            if (!num) return '0';
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        function addCardClickEvents() {
+            const cards = document.querySelectorAll('.model-card');
+            cards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // 如果点击的是收藏按钮，不跳转
+                    if (e.target.closest('.favorite-btn')) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const btn = e.target.closest('.favorite-btn');
+                        btn.classList.toggle('favorited');
+                        return;
+                    }
+                    
+                    const apiId = card.getAttribute('data-api-id');
+                    const modelName = card.querySelector('.api-name')?.textContent;
+                    if (apiId && modelName) {
+                        // 在新窗口打开AI应用详情页
+                        window.open(`ai-apps-model-detail.html?name=${encodeURIComponent(modelName)}&id=${encodeURIComponent(apiId)}`, '_blank');
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
+

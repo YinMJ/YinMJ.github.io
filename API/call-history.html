@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的调用记录 - RunningHub</title>
+    <link rel="stylesheet" href="standard-models-fixed.css?v=20251038">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* 调用记录页面特定样式 */
+        .call-history-page {
+            background: var(--rh-bg);
+            color: var(--rh-text);
+            min-height: 100vh;
+            padding-top: 60px;
+        }
+
+        /* 页面标题区域 */
+        .page-title-section {
+            background: var(--rh-surface);
+            border-bottom: 0.5px solid var(--rh-border);
+            padding: 40px 0;
+        }
+
+        .page-title-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .page-title-section h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: -0.005em;
+            color: var(--rh-text);
+            margin-bottom: 12px;
+        }
+
+        .page-title-section .subtitle {
+            font-size: 1rem;
+            color: var(--rh-muted);
+            line-height: 1.6;
+        }
+
+        /* 筛选和搜索区域 */
+        .filter-search-section {
+            background: var(--rh-surface);
+            border-bottom: 0.5px solid var(--rh-border);
+            padding: 24px 0;
+        }
+
+        .filter-search-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box-wrapper {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+
+        .search-box-wrapper input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 12px;
+            font-size: 14px;
+            color: var(--rh-text);
+            transition: all 0.2s ease;
+        }
+
+        .search-box-wrapper input:focus {
+            outline: none;
+            border-color: var(--rh-primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--rh-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-btn:hover {
+            background: var(--rh-surface-2);
+            border-color: var(--rh-primary);
+        }
+
+        .filter-btn.active {
+            background: var(--rh-primary);
+            color: #ffffff;
+            border-color: var(--rh-primary);
+        }
+
+        /* 表格容器 */
+        .table-section {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .table-container {
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table thead {
+            background: var(--rh-surface-2);
+            border-bottom: 0.5px solid var(--rh-border);
+        }
+
+        .history-table th {
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--rh-muted);
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+
+        .history-table tbody tr {
+            border-bottom: 0.5px solid var(--rh-border);
+            transition: background 0.2s ease;
+        }
+
+        .history-table tbody tr:hover {
+            background: var(--rh-surface-2);
+        }
+
+        .history-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .history-table td {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: var(--rh-text);
+            vertical-align: middle;
+        }
+
+        .api-name-cell {
+            font-weight: 500;
+            color: var(--rh-text);
+        }
+
+        .api-type-cell {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--rh-surface-2);
+            color: var(--rh-muted);
+        }
+
+        .status-cell {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: rgba(52, 199, 89, 0.1);
+            color: #34c759;
+        }
+
+        .status-error {
+            background: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+        }
+
+        .status-pending {
+            background: rgba(255, 149, 0, 0.1);
+            color: #ff9500;
+        }
+
+        .key-type-cell {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .key-type-consumer {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--rh-primary);
+        }
+
+        .key-type-shared {
+            background: rgba(52, 199, 89, 0.1);
+            color: #34c759;
+        }
+
+        .key-type-exclusive {
+            background: rgba(255, 149, 0, 0.1);
+            color: #ff9500;
+        }
+
+        .rh-coin-cell {
+            font-weight: 500;
+            color: var(--rh-text);
+        }
+
+        .cost-cell {
+            font-weight: 500;
+            color: var(--rh-text);
+        }
+
+        .time-cell {
+            color: var(--rh-muted);
+            font-size: 13px;
+        }
+
+        .billing-duration-cell {
+            color: var(--rh-text);
+            font-size: 14px;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            background: transparent;
+            border: 0.5px solid var(--rh-border);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--rh-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--rh-surface-2);
+            border-color: var(--rh-primary);
+            color: var(--rh-primary);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--rh-muted);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 24px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--rh-text);
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+            color: var(--rh-muted);
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 32px;
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--rh-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--rh-surface-2);
+            border-color: var(--rh-primary);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
+            background: var(--rh-primary);
+            color: #ffffff;
+            border-color: var(--rh-primary);
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: var(--rh-muted);
+            margin: 0 16px;
+        }
+
+        /* 汇总统计卡片 */
+        .summary-card {
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .summary-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--rh-muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .summary-label {
+            font-size: 13px;
+            color: var(--rh-muted);
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--rh-text);
+        }
+
+        .summary-value.highlight {
+            color: var(--rh-primary);
+        }
+
+        /* 时间筛选样式 */
+        .filter-select-wrapper,
+        .time-filter-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .time-filter-select {
+            padding: 10px 20px;
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--rh-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .time-filter-select:hover {
+            background: var(--rh-surface-2);
+            border-color: var(--rh-primary);
+        }
+
+        .time-filter-select:focus {
+            outline: none;
+            border-color: var(--rh-primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        /* 时间选择器弹窗 */
+        .datetime-picker-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .datetime-picker-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .datetime-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .datetime-picker-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--rh-text);
+            margin: 0;
+        }
+
+        .datetime-picker-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--rh-muted);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .datetime-picker-close:hover {
+            background: var(--rh-surface-2);
+            color: var(--rh-text);
+        }
+
+        .datetime-picker-field {
+            margin-bottom: 16px;
+        }
+
+        .datetime-picker-label {
+            display: block;
+            font-size: 13px;
+            color: var(--rh-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .datetime-picker-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 0.5px solid var(--rh-border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--rh-text);
+            background: var(--rh-surface);
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .datetime-picker-input:focus {
+            outline: none;
+            border-color: var(--rh-primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .datetime-picker-input-wrapper {
+            position: relative;
+        }
+
+        .datetime-picker-input-wrapper input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px 12px;
+            padding-right: 40px;
+            border: 0.5px solid var(--rh-border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--rh-text);
+            background: var(--rh-surface);
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .datetime-picker-input-wrapper input[type="datetime-local"]:focus {
+            outline: none;
+            border-color: var(--rh-primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .datetime-picker-calendar-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--rh-muted);
+            pointer-events: none;
+        }
+
+        .datetime-picker-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .datetime-picker-btn {
+            padding: 10px 20px;
+            border: 0.5px solid var(--rh-border);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .datetime-picker-btn-cancel {
+            background: var(--rh-surface);
+            color: var(--rh-text);
+        }
+
+        .datetime-picker-btn-cancel:hover {
+            background: var(--rh-surface-2);
+            border-color: var(--rh-primary);
+        }
+
+        .datetime-picker-btn-confirm {
+            background: var(--rh-primary);
+            color: white;
+            border-color: var(--rh-primary);
+        }
+
+        .datetime-picker-btn-confirm:hover {
+            background: #0051d5;
+            border-color: #0051d5;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .page-title-content,
+            .filter-search-content,
+            .table-section {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .summary-value {
+                font-size: 18px;
+            }
+
+            .history-table {
+                font-size: 12px;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 12px 8px;
+            }
+
+            .history-table thead {
+                display: none;
+            }
+
+            .history-table tbody tr {
+                display: block;
+                margin-bottom: 16px;
+                border: 0.5px solid var(--rh-border);
+                border-radius: 12px;
+                padding: 12px;
+            }
+
+            .history-table tbody td {
+                display: block;
+                padding: 8px 0;
+                text-align: right;
+                border: none;
+            }
+
+            .history-table tbody td::before {
+                content: attr(data-label) ': ';
+                font-weight: 600;
+                color: var(--rh-muted);
+                float: left;
+            }
+        }
+    </style>
+</head>
+<body class="standard-models-page call-history-page">
+    <!-- 顶部导航栏 -->
+    <header class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <span class="logo-icon">R</span> RunningHUB
+                </div>
+            </div>
+            <div class="nav-right">
+                <button class="nav-btn" onclick="window.location.href='index.html'">
+                    <i class="fas fa-home"></i>
+                </button>
+                <button class="nav-btn">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="nav-btn">
+                    <i class="fas fa-gem"></i>
+                </button>
+                <button class="nav-btn primary" onclick="window.location.href='admin.html'">
+                    进入控制台
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 页面标题区域 -->
+    <section class="page-title-section">
+        <div class="page-title-content">
+            <h1>我的调用记录</h1>
+            <p class="subtitle">查看您的 API 调用历史记录，包括调用状态、消费金额和详细信息</p>
+        </div>
+    </section>
+
+    <!-- 筛选和搜索区域 -->
+    <section class="filter-search-section">
+        <div class="filter-search-content">
+            <div class="search-box-wrapper">
+                <input type="text" id="searchInput" placeholder="搜索 API 名称、类型或密钥类型...">
+            </div>
+            <div class="filter-select-wrapper">
+                <select class="time-filter-select" id="statusFilterSelect">
+                    <option value="all">全部</option>
+                    <option value="success">成功</option>
+                    <option value="error">失败</option>
+                    <option value="pending">处理中</option>
+                </select>
+            </div>
+            <div class="time-filter-wrapper">
+                <select class="time-filter-select" id="timeFilterSelect">
+                    <option value="all">时间不限</option>
+                    <option value="1h">一小时内</option>
+                    <option value="1d">一天内</option>
+                    <option value="1w">一周内</option>
+                    <option value="1m">一个月内</option>
+                    <option value="1y">一年内</option>
+                    <option value="custom">自定义</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- 表格区域 -->
+    <section class="table-section">
+        <!-- 汇总统计 -->
+        <div class="summary-card" id="summaryCard">
+            <div class="summary-title">
+                <i class="fas fa-chart-bar"></i>
+                统计汇总
+            </div>
+            <div class="summary-grid" id="summaryGrid">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>API 名称</th>
+                        <th>API 类型</th>
+                        <th>密钥类型</th>
+                        <th>调用时间</th>
+                        <th>状态</th>
+                        <th>计费时长</th>
+                        <th>RH币</th>
+                        <th id="costHeader">消费金额</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <!-- 动态生成 -->
+                </tbody>
+            </table>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <h3>暂无调用记录</h3>
+                <p>您还没有任何 API 调用记录</p>
+            </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination" id="pagination">
+            <!-- 动态生成 -->
+        </div>
+    </section>
+
+    <script>
+        // 模拟数据（实际应从后端API获取）
+        // 生成586条数据用于测试分页
+        const mockHistoryData = [];
+        const apiNames = [
+            'Nano Banana', 'Flux Kontext', 'Stable Diffusion XL', 'LLaMA 3.1', 'Veo 3.1',
+            '智能抠图', '文案自动生成', '老照片修复', '图像超分辨率', '语音转文字',
+            '影视分镜生成工作流', '多风格插画批量制作', 'AI 视频剪辑', '图像风格迁移', '文本摘要生成'
+        ];
+        const apiTypes = ['标准模型API', 'AI应用API', 'ComfyUI工作流API'];
+        const keyTypes = ['消费级-会员', '企业级-共享', '企业级-独占'];
+        const statuses = ['success', 'success', 'success', 'error', 'pending']; // 80%成功，15%失败，5%处理中
+
+        // 生成586条数据
+        for (let i = 1; i <= 586; i++) {
+            const apiName = apiNames[Math.floor(Math.random() * apiNames.length)];
+            const apiType = apiTypes[Math.floor(Math.random() * apiTypes.length)];
+            const keyType = keyTypes[Math.floor(Math.random() * keyTypes.length)];
+            const status = statuses[Math.floor(Math.random() * statuses.length)];
+            
+            // 根据密钥类型和状态计算RH币和消费金额
+            let rhCoin = 0;
+            let cost = 0;
+            
+            if (status === 'success') {
+                if (keyType === '企业级-独占') {
+                    // 企业级-独占：租期内免费
+                    rhCoin = 0;
+                    cost = 0;
+                } else if (keyType === '企业级-共享') {
+                    // 企业级-共享：只扣钱包里的钱
+                    rhCoin = 0;
+                    cost = parseFloat((Math.random() * 0.2 + 0.02).toFixed(2));
+                } else {
+                    // 消费级-会员：扣RH币，如果有第三方API还扣钱包
+                    rhCoin = Math.floor(Math.random() * 10) + 1;
+                    // 30%概率有第三方API，需要扣钱包
+                    if (Math.random() < 0.3) {
+                        cost = parseFloat((Math.random() * 0.1 + 0.01).toFixed(2));
+                    } else {
+                        cost = 0;
+                    }
+                }
+            }
+
+            // 生成时间（最近30天）
+            const daysAgo = Math.floor(Math.random() * 30);
+            const hoursAgo = Math.floor(Math.random() * 24);
+            const minutesAgo = Math.floor(Math.random() * 60);
+            const date = new Date();
+            date.setDate(date.getDate() - daysAgo);
+            date.setHours(date.getHours() - hoursAgo);
+            date.setMinutes(date.getMinutes() - minutesAgo);
+            const timeStr = date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }).replace(/\//g, '-');
+
+            // 随机生成区域（70%国内，30%国外）
+            const region = Math.random() < 0.7 ? 'domestic' : 'international';
+            
+            // 生成计费时长（只有AI应用API和ComfyUI工作流API有值）
+            let billingDuration = '-';
+            if (apiType === 'AI应用API' || apiType === 'ComfyUI工作流API') {
+                // 生成随机的计费时长（秒）
+                const seconds = Math.floor(Math.random() * 300) + 1; // 1-300秒
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                // 格式化为 MM:SS（纯数字，补零）
+                billingDuration = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+            }
+            
+            // 生成API ID（用于跳转到详情页）
+            const apiId = Math.floor(Math.random() * 10000) + 1000;
+            
+            mockHistoryData.push({
+                id: i,
+                apiName: apiName,
+                apiType: apiType,
+                keyType: keyType,
+                time: timeStr,
+                status: status,
+                billingDuration: billingDuration,
+                rhCoin: rhCoin,
+                cost: cost,
+                region: region,
+                apiId: apiId
+            });
+        }
+
+        // 按时间倒序排序（最新的在前面）
+        mockHistoryData.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+        let allHistoryData = [...mockHistoryData];
+        let filteredData = [...mockHistoryData];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let currentFilter = 'all';
+        let currentTimeFilter = 'all';
+        let customTimeRange = { start: null, end: null };
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从URL参数恢复筛选状态
+            restoreFilterState();
+            renderTable();
+            setupSearch();
+            setupFilters();
+            setupTimeFilter();
+            renderPagination();
+            updateSummary(); // 初始化汇总统计
+        });
+
+        // 恢复筛选状态
+        function restoreFilterState() {
+            // 确保数据已初始化
+            if (!allHistoryData || allHistoryData.length === 0) {
+                allHistoryData = [...mockHistoryData];
+            }
+            if (!filteredData || filteredData.length === 0) {
+                filteredData = [...allHistoryData];
+            }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('search') || '';
+            const filterType = urlParams.get('filter') || 'all';
+            const pageNum = parseInt(urlParams.get('page')) || 1;
+
+            // 恢复搜索关键词
+            if (searchQuery) {
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.value = searchQuery;
+                }
+            }
+
+            // 恢复筛选类型
+            const statusFilterSelect = document.getElementById('statusFilterSelect');
+            if (statusFilterSelect) {
+                statusFilterSelect.value = filterType;
+                currentFilter = filterType;
+            }
+
+            // 恢复页码
+            if (pageNum > 1) {
+                currentPage = pageNum;
+            }
+
+            // 应用筛选
+            if (searchQuery || filterType !== 'all') {
+                applyFilters(searchQuery);
+            } else {
+                // 如果没有筛选条件，确保 filteredData 是 allHistoryData 的副本
+                filteredData = [...allHistoryData];
+            }
+        }
+
+        // 渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('historyTableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (!filteredData || filteredData.length === 0) {
+                tbody.innerHTML = '';
+                if (emptyState) emptyState.style.display = 'block';
+                return;
+            }
+
+            if (emptyState) emptyState.style.display = 'none';
+            
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredData.slice(start, end);
+
+            tbody.innerHTML = pageData.map(item => `
+                <tr>
+                    <td class="api-name-cell" data-label="API 名称">${item.apiName}</td>
+                    <td data-label="API 类型">
+                        <span class="api-type-cell">${item.apiType}</span>
+                    </td>
+                    <td data-label="密钥类型">
+                        <span class="key-type-cell key-type-${getKeyTypeClass(item.keyType)}">${item.keyType}</span>
+                    </td>
+                    <td class="time-cell" data-label="调用时间">${item.time}</td>
+                    <td data-label="状态">
+                        <span class="status-cell status-${item.status}">
+                            <i class="fas fa-${getStatusIcon(item.status)}"></i>
+                            ${getStatusText(item.status)}
+                        </span>
+                    </td>
+                    <td class="billing-duration-cell" data-label="计费时长">${item.billingDuration || '-'}</td>
+                    <td class="rh-coin-cell" data-label="RH币">${item.rhCoin > 0 ? item.rhCoin : '-'}</td>
+                    <td class="cost-cell" data-label="${getCurrencySymbol(item.region || 'domestic')}消费金额">${formatCostValue(item.cost)}</td>
+                    <td class="action-cell" data-label="操作">
+                        <button class="action-btn" onclick="viewDetail(${item.id})">调用详情</button>
+                        <button class="action-btn" onclick="goToApiDetail('${item.apiType}', '${item.apiName}', ${item.apiId})">API详情</button>
+                        <button class="action-btn" onclick="retryCall(${item.id})" ${item.status === 'error' ? '' : 'style="display:none"'}>重试</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            renderPagination();
+            
+            // 更新表头单位显示
+            updateCostHeader();
+        }
+
+        // 获取状态图标
+        function getStatusIcon(status) {
+            const icons = {
+                success: 'check-circle',
+                error: 'times-circle',
+                pending: 'clock'
+            };
+            return icons[status] || 'circle';
+        }
+
+        // 获取状态文字
+        function getStatusText(status) {
+            const texts = {
+                success: '成功',
+                error: '失败',
+                pending: '处理中'
+            };
+            return texts[status] || '未知';
+        }
+
+        // 获取密钥类型CSS类
+        function getKeyTypeClass(keyType) {
+            const classMap = {
+                '消费级-会员': 'consumer',
+                '企业级-共享': 'shared',
+                '企业级-独占': 'exclusive'
+            };
+            return classMap[keyType] || 'consumer';
+        }
+
+        // 格式化消费金额显示（只显示数值，不显示单位）
+        function formatCostValue(cost) {
+            if (cost === 0 || cost === null || cost === undefined) {
+                return '0.00';
+            }
+            return parseFloat(cost).toFixed(2);
+        }
+
+        // 获取货币符号（根据region）
+        function getCurrencySymbol(region) {
+            return region === 'domestic' ? '¥' : '$';
+        }
+
+        // 更新表头显示单位（根据当前数据的主要region或用户设置）
+        function updateCostHeader() {
+            const costHeader = document.getElementById('costHeader');
+            if (!costHeader) return;
+            
+            // 统计当前显示的数据中，国内和国外的数量
+            let domesticCount = 0;
+            let internationalCount = 0;
+            
+            if (filteredData.length > 0) {
+                filteredData.forEach(item => {
+                    if (item.region === 'domestic') {
+                        domesticCount++;
+                    } else if (item.region === 'international') {
+                        internationalCount++;
+                    }
+                });
+            }
+            
+            // 如果数据为空，默认显示国内
+            // 根据数据中占多数的region来决定表头显示
+            const region = domesticCount >= internationalCount ? 'domestic' : 'international';
+            const symbol = getCurrencySymbol(region);
+            costHeader.textContent = `${symbol}消费金额`;
+        }
+
+        // 格式化计费时长为 HH:MM:SS
+        function formatBillingDuration(totalSeconds) {
+            if (!totalSeconds || totalSeconds === 0) return '00:00:00';
+            
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // 解析计费时长字符串为秒数
+        function parseBillingDuration(durationStr) {
+            if (!durationStr || durationStr === '-') return 0;
+            
+            // 格式为 MM:SS
+            const parts = durationStr.split(':');
+            if (parts.length === 2) {
+                const minutes = parseInt(parts[0]) || 0;
+                const seconds = parseInt(parts[1]) || 0;
+                return minutes * 60 + seconds;
+            }
+            return 0;
+        }
+
+        // 更新汇总统计
+        function updateSummary() {
+            const summaryGrid = document.getElementById('summaryGrid');
+            if (!summaryGrid) return;
+            
+            if (filteredData.length === 0) {
+                summaryGrid.innerHTML = `
+                    <div class="summary-item">
+                        <span class="summary-label">记录总数</span>
+                        <span class="summary-value">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">计费时长总计</span>
+                        <span class="summary-value">00:00:00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">RH币总计</span>
+                        <span class="summary-value">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">消费金额总计</span>
+                        <span class="summary-value">0.00</span>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 计算汇总数据
+            let totalBillingSeconds = 0;
+            let totalRhCoin = 0;
+            let totalCost = 0;
+            let domesticCost = 0;
+            let internationalCost = 0;
+            let domesticCount = 0;
+            let internationalCount = 0;
+            
+            filteredData.forEach(item => {
+                // 计费时长总计（只统计有值的记录）
+                if (item.billingDuration && item.billingDuration !== '-') {
+                    totalBillingSeconds += parseBillingDuration(item.billingDuration);
+                }
+                
+                // RH币总计
+                totalRhCoin += item.rhCoin || 0;
+                
+                // 消费金额总计（区分国内/国外）
+                if (item.region === 'domestic') {
+                    domesticCost += item.cost || 0;
+                    domesticCount++;
+                } else if (item.region === 'international') {
+                    internationalCost += item.cost || 0;
+                    internationalCount++;
+                }
+            });
+            
+            // 确定主要货币类型
+            const mainRegion = domesticCount >= internationalCount ? 'domestic' : 'international';
+            const currencySymbol = getCurrencySymbol(mainRegion);
+            totalCost = mainRegion === 'domestic' ? domesticCost : internationalCost;
+            
+            summaryGrid.innerHTML = `
+                <div class="summary-item">
+                    <span class="summary-label">记录总数</span>
+                    <span class="summary-value">${filteredData.length}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">计费时长总计</span>
+                    <span class="summary-value">${formatBillingDuration(totalBillingSeconds)}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">RH币总计</span>
+                    <span class="summary-value highlight">${totalRhCoin}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">${currencySymbol}消费金额总计</span>
+                    <span class="summary-value highlight">${formatCostValue(totalCost)}</span>
+                </div>
+            `;
+        }
+
+        // 设置搜索功能
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim().toLowerCase();
+                
+                searchTimeout = setTimeout(() => {
+                    applyFilters(query);
+                }, 300);
+            });
+        }
+
+        // 设置筛选功能
+        function setupFilters() {
+            const statusFilterSelect = document.getElementById('statusFilterSelect');
+            if (!statusFilterSelect) return;
+            
+            statusFilterSelect.addEventListener('change', function() {
+                currentFilter = this.value;
+                const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+                applyFilters(searchQuery);
+            });
+        }
+
+        // 设置时间筛选功能
+        function setupTimeFilter() {
+            const timeFilterSelect = document.getElementById('timeFilterSelect');
+            if (!timeFilterSelect) return;
+            
+            timeFilterSelect.addEventListener('change', function() {
+                currentTimeFilter = this.value;
+                
+                if (currentTimeFilter === 'custom') {
+                    // 显示自定义时间选择器
+                    showCustomTimePicker();
+                } else {
+                    // 清除自定义时间范围
+                    customTimeRange = { start: null, end: null };
+                    const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+                    applyFilters(searchQuery);
+                }
+            });
+        }
+
+        // 显示自定义时间选择器弹窗
+        function showCustomTimePicker() {
+            // 创建弹窗
+            const modal = document.createElement('div');
+            modal.className = 'datetime-picker-modal';
+            modal.id = 'datetimePickerModal';
+            
+            // 获取当前时间作为默认值
+            const now = new Date();
+            const defaultStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 默认7天前
+            const defaultEnd = now;
+            
+            const startValue = customTimeRange.start ? convertFullToDateTimeLocal(customTimeRange.start) : formatDateTimeForInput(defaultStart);
+            const endValue = customTimeRange.end ? convertFullToDateTimeLocal(customTimeRange.end) : formatDateTimeForInput(defaultEnd);
+            
+            modal.innerHTML = `
+                <div class="datetime-picker-container">
+                    <div class="datetime-picker-header">
+                        <h3 class="datetime-picker-title">选择时间范围</h3>
+                        <button class="datetime-picker-close" onclick="closeCustomTimePicker()">&times;</button>
+                    </div>
+                    <div class="datetime-picker-field">
+                        <label class="datetime-picker-label">从</label>
+                        <div class="datetime-picker-input-wrapper">
+                            <input type="datetime-local" class="datetime-picker-input" id="timeStartInput" value="${convertFullToDateTimeLocalForInput(startValue)}" step="1">
+                            <i class="fas fa-calendar-alt datetime-picker-calendar-icon"></i>
+                        </div>
+                        <small style="display: block; margin-top: 4px; color: var(--rh-muted); font-size: 12px;">点击输入框选择日期和时间（支持秒）</small>
+                    </div>
+                    <div class="datetime-picker-field">
+                        <label class="datetime-picker-label">至</label>
+                        <div class="datetime-picker-input-wrapper">
+                            <input type="datetime-local" class="datetime-picker-input" id="timeEndInput" value="${convertFullToDateTimeLocalForInput(endValue)}" step="1">
+                            <i class="fas fa-calendar-alt datetime-picker-calendar-icon"></i>
+                        </div>
+                        <small style="display: block; margin-top: 4px; color: var(--rh-muted); font-size: 12px;">点击输入框选择日期和时间（支持秒）</small>
+                    </div>
+                    <div class="datetime-picker-actions">
+                        <button class="datetime-picker-btn datetime-picker-btn-cancel" onclick="closeCustomTimePicker()">取消</button>
+                        <button class="datetime-picker-btn datetime-picker-btn-confirm" onclick="confirmCustomTime()">确认</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // 点击遮罩层关闭
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeCustomTimePicker();
+                }
+            });
+        }
+
+        // 关闭自定义时间选择器
+        function closeCustomTimePicker() {
+            const modal = document.getElementById('datetimePickerModal');
+            if (modal) {
+                modal.remove();
+            }
+            // 如果时间范围未确认，恢复下拉菜单到之前的选择
+            const timeFilterSelect = document.getElementById('timeFilterSelect');
+            if (timeFilterSelect && (!customTimeRange.start || !customTimeRange.end)) {
+                timeFilterSelect.value = currentTimeFilter === 'custom' ? 'all' : currentTimeFilter;
+                currentTimeFilter = timeFilterSelect.value;
+            }
+        }
+
+        // 确认自定义时间
+        function confirmCustomTime() {
+            const startInput = document.getElementById('timeStartInput');
+            const endInput = document.getElementById('timeEndInput');
+            
+            if (!startInput || !endInput) {
+                alert('请选择开始时间和结束时间');
+                return;
+            }
+            
+            const startValue = startInput.value;
+            const endValue = endInput.value;
+            
+            if (!startValue || !endValue) {
+                alert('请选择开始时间和结束时间');
+                return;
+            }
+            
+            // 转换格式：datetime-local 格式为 YYYY-MM-DDTHH:mm，需要转换为 YYYY-MM-DD HH:mm:ss
+            customTimeRange.start = convertDateTimeLocalToFull(startValue);
+            customTimeRange.end = convertDateTimeLocalToFull(endValue);
+            
+            // 验证时间有效性
+            const startDate = new Date(customTimeRange.start);
+            const endDate = new Date(customTimeRange.end);
+            
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                alert('时间格式无效，请检查输入的时间');
+                return;
+            }
+            
+            // 验证时间范围
+            if (startDate > endDate) {
+                alert('开始时间不能晚于结束时间');
+                return;
+            }
+            
+            // 关闭弹窗
+            closeCustomTimePicker();
+            
+            // 应用筛选
+            const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            applyFilters(searchQuery);
+        }
+
+        // 格式化日期时间为输入框格式（YYYY-MM-DD HH:mm:ss）
+        function formatDateTimeForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        // 转换完整日期时间格式为 datetime-local 输入格式（YYYY-MM-DDTHH:mm）
+        function convertFullToDateTimeLocalForInput(fullDateTime) {
+            // 完整格式：YYYY-MM-DD HH:mm:ss
+            // 转换为：YYYY-MM-DDTHH:mm（datetime-local 格式）
+            if (!fullDateTime) return '';
+            // 将空格替换为 T，并截取到分钟（datetime-local 不支持秒的显示，但可以通过 step="1" 支持秒的选择）
+            return fullDateTime.replace(' ', 'T').substring(0, 16);
+        }
+
+        // 转换完整日期时间格式（用于显示）
+        function convertFullToDateTimeLocal(fullDateTime) {
+            // 完整格式：YYYY-MM-DD HH:mm:ss
+            // 直接返回，用于文本输入框
+            if (!fullDateTime) return '';
+            return fullDateTime;
+        }
+
+        // 转换输入值为完整日期时间格式（YYYY-MM-DD HH:mm:ss）
+        function convertDateTimeLocalToFull(dateTimeInput) {
+            // 输入格式：datetime-local 格式为 YYYY-MM-DDTHH:mm
+            if (!dateTimeInput) return null;
+            
+            // 如果已经是完整格式（YYYY-MM-DD HH:mm:ss），直接返回
+            if (dateTimeInput.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
+                return dateTimeInput;
+            }
+            
+            // 如果是 datetime-local 格式（YYYY-MM-DDTHH:mm），转换为完整格式
+            if (dateTimeInput.includes('T')) {
+                const parts = dateTimeInput.split('T');
+                if (parts.length === 2) {
+                    const timePart = parts[1];
+                    const timeParts = timePart.split(':');
+                    // datetime-local 格式通常只有 HH:mm，需要添加秒
+                    if (timeParts.length === 2) {
+                        return `${parts[0]} ${timePart}:00`;
+                    } else if (timeParts.length === 3) {
+                        // 如果有秒，直接转换
+                        return `${parts[0]} ${timePart}`;
+                    }
+                    return `${parts[0]} ${timePart}`;
+                }
+            }
+            
+            return dateTimeInput;
+        }
+
+        // 时间筛选逻辑
+        function filterByTime(itemTime) {
+            if (currentTimeFilter === 'all') {
+                return true;
+            }
+            
+            const now = new Date();
+            const itemDate = new Date(itemTime);
+            
+            if (currentTimeFilter === 'custom') {
+                if (!customTimeRange.start || !customTimeRange.end) {
+                    return true; // 如果自定义时间未设置，显示所有
+                }
+                const startDate = new Date(customTimeRange.start);
+                const endDate = new Date(customTimeRange.end);
+                return itemDate >= startDate && itemDate <= endDate;
+            }
+            
+            let timeDiff = now - itemDate;
+            
+            switch (currentTimeFilter) {
+                case '1h':
+                    return timeDiff <= 3600000; // 1小时 = 3600000毫秒
+                case '1d':
+                    return timeDiff <= 86400000; // 1天 = 86400000毫秒
+                case '1w':
+                    return timeDiff <= 604800000; // 1周 = 604800000毫秒
+                case '1m':
+                    return timeDiff <= 2592000000; // 1个月 ≈ 2592000000毫秒
+                case '1y':
+                    return timeDiff <= 31536000000; // 1年 ≈ 31536000000毫秒
+                default:
+                    return true;
+            }
+        }
+
+        // 应用筛选和搜索
+        function applyFilters(searchQuery = '') {
+            filteredData = allHistoryData.filter(item => {
+                // 状态筛选
+                const statusMatch = currentFilter === 'all' || item.status === currentFilter;
+                
+                // 搜索筛选（支持API名称、API类型、密钥类型）
+                const searchMatch = !searchQuery || 
+                    item.apiName.toLowerCase().includes(searchQuery) ||
+                    item.apiType.toLowerCase().includes(searchQuery) ||
+                    item.keyType.toLowerCase().includes(searchQuery);
+                
+                // 时间筛选
+                const timeMatch = filterByTime(item.time);
+                
+                return statusMatch && searchMatch && timeMatch;
+            });
+
+            currentPage = 1; // 重置到第一页
+            renderTable();
+            // 更新表头单位显示
+            updateCostHeader();
+            // 更新汇总统计
+            updateSummary();
+        }
+
+        // 渲染分页
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = `
+                <button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            // 显示页码按钮
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    paginationHTML += `
+                        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    paginationHTML += `<span class="pagination-btn" style="border: none; cursor: default;">...</span>`;
+                }
+            }
+
+            paginationHTML += `
+                <button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <span class="pagination-info">
+                    每页 ${itemsPerPage} 条，总共 ${filteredData.length} 条
+                </span>
+            `;
+
+            pagination.innerHTML = paginationHTML;
+        }
+
+        // 跳转到指定页码
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            
+            currentPage = page;
+            renderTable();
+            
+            // 滚动到表格顶部
+            document.querySelector('.table-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // 查看详情
+        function viewDetail(id) {
+            // 获取当前筛选状态
+            const searchQuery = document.getElementById('searchInput').value.trim();
+            const filterType = currentFilter;
+            const currentPageNum = currentPage;
+            
+            // 构建返回URL参数
+            const params = new URLSearchParams({
+                id: id
+            });
+            
+            // 如果有搜索关键词，添加到参数中
+            if (searchQuery) {
+                params.set('search', searchQuery);
+            }
+            
+            // 如果有筛选类型（不是全部），添加到参数中
+            if (filterType !== 'all') {
+                params.set('filter', filterType);
+            }
+            
+            // 如果有页码（不是第一页），添加到参数中
+            if (currentPageNum > 1) {
+                params.set('page', currentPageNum);
+            }
+            
+            // 跳转到详情页面
+            window.location.href = `call-history-detail.html?${params.toString()}`;
+        }
+
+        // 重试调用
+        function retryCall(id) {
+            const item = allHistoryData.find(d => d.id === id);
+            if (item) {
+                if (confirm(`确定要重新调用 "${item.apiName}" 吗？`)) {
+                    // 这里应该调用实际的API
+                    alert('正在重试调用...');
+                    // 更新状态为 pending
+                    item.status = 'pending';
+                    renderTable();
+                }
+            }
+        }
+
+        // 跳转到API详情页
+        function goToApiDetail(apiType, apiName, apiId) {
+            let url = '';
+            
+            if (apiType === '标准模型API') {
+                // 标准模型API详情页
+                url = `model-detail.html?id=${apiId}`;
+            } else if (apiType === 'AI应用API') {
+                // AI应用API详情页
+                url = `ai-apps-model-detail.html?name=${encodeURIComponent(apiName)}&id=${apiId}`;
+            } else if (apiType === 'ComfyUI工作流API') {
+                // ComfyUI工作流API详情页
+                url = `comfyui-workflows-model-detail.html?name=${encodeURIComponent(apiName)}&id=${apiId}`;
+            } else {
+                alert('未知的API类型');
+                return;
+            }
+            
+            // 在新窗口打开详情页
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RunningHub API</title>
+    <link rel="stylesheet" href="styles.css?v=20251051">
+    <link rel="stylesheet" href="standard-models.css?v=20251030">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="top-nav-index">
+        <div class="top-nav-container">
+            <div class="top-nav-right">
+                <button class="top-nav-btn" title="用户中心">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <button class="top-nav-btn" title="黄钻">
+                    <i class="fas fa-gem"></i>
+                </button>
+                <button class="top-nav-btn" title="通知">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="top-nav-btn" title="联系">
+                    <i class="fas fa-headset"></i>
+                </button>
+                <button class="top-nav-btn primary" title="开始创作">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>开始创作</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="page-wrapper">
+        <!-- 左侧导航栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button class="hamburger-menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <span class="logo-icon">R</span> RunningHUB
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="nav-item"><i class="fas fa-home"></i> 首页</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-palette"></i> 快捷创作 <span class="tag-free">限免</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-lightbulb"></i> 作品广场</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-robot"></i> AI应用</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-project-diagram"></i> 工作流</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-cube"></i> 模型库</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-plus-square"></i> 模型训练</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-magic"></i> 模型创作 <span class="tag-free">限免</span></a></li>
+                </ul>
+                <div class="separator"></div>
+                <ul>
+                    <li><a href="#" class="nav-item"><i class="fas fa-chart-line"></i> 工作台</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-user"></i> 个人中心</a></li>
+                    <li><a href="#" class="nav-item active"><i class="fas fa-key"></i> API调用</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="invite-button">
+                    <i class="fas fa-gift"></i> 邀请好友赚RH币
+                </button>
+                <div class="footer-links">
+                    <a href="#" class="footer-card">
+                        <div class="card-icon">R</div>
+                        <div class="card-content">
+                            <small>微信小程序</small>
+                            <span>RunningHub</span>
+                        </div>
+                    </a>
+                    <a href="#" class="footer-card">
+                        <div class="card-icon"><i class="fas fa-book"></i></div>
+                        <div class="card-content">
+                            <small>用户</small>
+                            <span>手册</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <div class="main-content-wrapper">
+            <!-- 顶部导航和价值主张 -->
+            <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="value-proposition">
+                    <h1 class="main-title">RunningHub API</h1>
+                    <p class="subtitle">一键调用从基础模型到定制工作流的全量AI能力</p>
+                    <p class="description">RH 提供多样化 API 接入方案，涵盖模型调用、算力分配与扩展能力，计费方式清晰透明。API 包括消费级与企业级接口，并支持三方 API（调用外部优质模型，按次计费）。用户可通过 API 访问 RH 全部工作流（含自建与平台工作流），无缝集成至业务系统，实现批量生成、自动化处理及复杂逻辑组合。同时，API 兼容 PS(<a href="https://github.com/zombieyang/sd-ppp" target="_blank" class="description-link">SD-PPP</a>)、Coze、EasvA1、Kita、SillyTavern 等<a href="https://s.apifox.cn/b860476a-b4d0-4aa5-91b8-6dcaa18d6c7d" target="_blank" class="description-link">第三方插件</a>，可打通第三方工具与工作流，助力智能化创作与业务高效落地。用户无需部署算力，可直接调用标准模型、成品 AI 应用或自定义 ComfyUI 工作流，快速集成到业务系统中。</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn-primary">
+                        进入控制台
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div class="dropdown-wrapper">
+                        <button class="btn-secondary dropdown-btn" data-dropdown="sdk">
+                            其他SDK下载
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="sdk-dropdown">
+                            <a href="https://github.com/HM-RunningHub" target="_blank" class="dropdown-item">Github</a>
+                            <a href="https://github.com/HM-RunningHub/RH_CozeSDK" target="_blank" class="dropdown-item">Coze SDK</a>
+                            <a href="https://github.com/HM-RunningHub/ComfyUI_RH_APICall" target="_blank" class="dropdown-item">ComfyUI插件</a>
+                            <a href="https://github.com/zombieyang/sd-ppp" target="_blank" class="dropdown-item">SD-PPP</a>
+                        </div>
+                    </div>
+                    <div class="dropdown-wrapper">
+                        <button class="btn-secondary dropdown-btn" data-dropdown="docs">
+                            文档中心
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="docs-dropdown">
+                            <a href="https://s.apifox.cn/b860476a-b4d0-4aa5-91b8-6dcaa18d6c7d" target="_blank" class="dropdown-item">API文档</a>
+                            <a href="https://runninghub.feishu.cn/wiki/PdmcwScGMiXiuWk5PqhcD7LznYr" target="_blank" class="dropdown-item">三方API调用说明</a>
+                        </div>
+                    </div>
+                    <button class="btn-primary">
+                        <i class="fas fa-history"></i>
+                        我的调用记录
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 核心API分类区域 -->
+    <main class="main-content">
+        <div class="container">
+            <section class="api-categories">
+                <h2 class="section-title">选择适合你的API类型</h2>
+                <div class="cards-container">
+                    <!-- 标准模型API卡片 -->
+                    <div class="api-card standard-model">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <h3 class="card-title">标准模型 API</h3>
+                        </div>
+                        <div class="card-content">
+                            <p class="card-description">调用预训练模型的基础能力，即调即用</p>
+                            <div class="use-cases">
+                                <div class="use-case">
+                                    <i class="fas fa-comment-dots"></i>
+                                    <span>文本生成</span>
+                                </div>
+                                <div class="use-case">
+                                    <i class="fas fa-image"></i>
+                                    <span>图像基础生成</span>
+                                </div>
+                                <div class="use-case">
+                                    <i class="fas fa-microphone"></i>
+                                    <span>语音转写</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="model-count">包含 100+ 模型</span>
+                                <button class="btn-card">
+                                    查看详情
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI应用API卡片 -->
+                    <div class="api-card ai-app">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <h3 class="card-title">AI 应用 API</h3>
+                        </div>
+                        <div class="card-content">
+                            <p class="card-description">调用现成的 AI 应用，直接复用完整功能</p>
+                            <div class="use-cases">
+                                <div class="use-case">
+                                    <i class="fas fa-cut"></i>
+                                    <span>智能抠图</span>
+                                </div>
+                                <div class="use-case">
+                                    <i class="fas fa-pen-fancy"></i>
+                                    <span>文案自动生成</span>
+                                </div>
+                                <div class="use-case">
+                                    <i class="fas fa-magic"></i>
+                                    <span>老照片修复</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="model-count">包含 300+ 应用</span>
+                                <button class="btn-card">
+                                    查看详情
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ComfyUI工作流API卡片 -->
+                    <div class="api-card comfyui-workflow">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                            <h3 class="card-title">ComfyUI 工作流 API</h3>
+                        </div>
+                        <div class="card-content">
+                            <p class="card-description">调用自定义或社区的 ComfyUI 工作流</p>
+                            <div class="use-cases">
+                                <div class="use-case">
+                                    <i class="fas fa-film"></i>
+                                    <span>影视分镜生成</span>
+                                </div>
+                                <div class="use-case">
+                                    <i class="fas fa-palette"></i>
+                                    <span>多风格插画批量制作</span>
+                                </div>
+                                <div class="use-case">
+                                    <i class="fas fa-video"></i>
+                                    <span>AI 视频剪辑</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="model-count">包含 500+ 工作流</span>
+                                <button class="btn-card">
+                                    查看详情
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 决策指南 -->
+            <section class="decision-guide">
+                <div class="guide-container">
+                    <div class="guide-header">
+                        <h3 class="guide-title">
+                            <i class="fas fa-question-circle"></i>
+                            我该选哪种API？
+                        </h3>
+                        <p class="guide-subtitle">根据你的具体需求，选择最合适的API类型</p>
+                    </div>
+                    
+                    <div class="guide-options">
+                        <div class="guide-option" data-type="standard-model">
+                            <div class="option-arrow">→</div>
+                            <div class="option-content">
+                                <p>如果你需要调用单个模型（如Stable Diffusion、LLaMA）的基础能力，选<strong>「标准模型API」</strong></p>
+                            </div>
+                        </div>
+                        
+                        <div class="guide-option" data-type="ai-app">
+                            <div class="option-arrow">→</div>
+                            <div class="option-content">
+                                <p>如果你需要直接集成一个完整功能（如"自动生成电商主图""合同条款提取"），选<strong>「AI应用API」</strong></p>
+                            </div>
+                        </div>
+                        
+                        <div class="guide-option" data-type="comfyui-workflow">
+                            <div class="option-arrow">→</div>
+                            <div class="option-content">
+                                <p>如果你需要复用自己或社区设计的ComfyUI工作流（如"先修图→再风格迁移→最后超分"的定制流程），选<strong>「ComfyUI工作流API」</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- API KEY类型和权益对比 -->
+    <section class="api-key-comparison">
+        <div class="container">
+            <!-- API KEY类型 -->
+            <div class="api-types-section">
+                <h2 class="api-key-section-title">API KEY 类型</h2>
+                <div class="api-type-cards">
+                    <div class="api-type-card card-member">
+                        <h5>消费级-会员</h5>
+                        <p>适合个人和小团队使用。基础版支持1并发，专业版支持3并发，专业Plus版支持5并发。基于强大的ComfyUI环境，支持7*24小时稳定运行和高效工作流，满足小规模创作需求。<br>注：需要基础版及以上会员身份才能通过API KEY正常调用API。</p>
+                        <button class="card-btn btn-blue">去开通</button>
+                    </div>
+                    <div class="api-type-card card-shared">
+                        <h5>企业级-共享</h5>
+                        <p>基于RH公共资源池，提供弹性调用服务，默认并发为50，按实际使用计费。用户可以灵活调用各类工作流，按需扩展调用规模。适合日常业务接入、批量处理、阶段性增长等场景，平衡灵活性与成本效益。</p>
+                        <button class="card-btn btn-orange">去充值</button>
+                    </div>
+                    <div class="api-type-card card-exclusive">
+                        <h5>企业级-独占</h5>
+                        <p>为性能敏感或大规模生产环境提供专用计算资源。通过独立租用GPU算力，用户可以享受固定并发和稳定响应速度。特别适合对高并发、低延迟、稳定性要求严格的核心业务场景。</p>
+                        <button class="card-btn btn-orange">去开通</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 我们的优势 -->
+    <section class="advantages">
+        <div class="container">
+            <h2 class="advantages-title">我们的优势</h2>
+            <div class="advantages-grid">
+                <div class="advantage-card">
+                    <div class="advantage-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3 class="advantage-title">节省运维成本</h3>
+                    <p class="advantage-description">
+                        租用云服务器还需要自己部署和维护 ComfyUI，复杂而成本高昂，而 RunningHub 提供始终维护良好的 ComfyUI 运行环境，节省运维部署成本
+                    </p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3 class="advantage-title">节省算力成本</h3>
+                    <p class="advantage-description">
+                        租用云服务器，需要在租用周期内始终付费，而 RunningHub 的API调用模式，只在调用API时付费
+                    </p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="advantage-title">更好的核心体验</h3>
+                    <p class="advantage-description">
+                        对比其他 API平台，RunningHub 支持最新最全的 ComfyUI 节点插件和业界AI模型并保持每日更新，是全球100多个国家的开发者首选的ComfyUI云平台，保证您的业务始终能使用业界最新最好的技术保持最好的体验
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2024 RunningHub. 让AI能力触手可及</p>
+                <div class="footer-links">
+                    <a href="#">帮助中心</a>
+                    <a href="#">联系我们</a>
+                    <a href="#">服务条款</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

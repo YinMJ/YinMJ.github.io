@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI应用详情 - RunningHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* 背景图片 */
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('./ai-detail-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            z-index: -1;
+        }
+
+        /* 备用背景（如果图片加载失败时显示） */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            z-index: -2;
+        }
+
+        /* 背景遮罩层 */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2); /* 半透明遮罩，确保内容可见 */
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 主要内容区域 - 透明按钮覆盖层 */
+        .main-content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none; /* 让背景可以正常显示 */
+        }
+
+        /* 透明按钮容器 */
+        .transparent-buttons-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto; /* 允许按钮接收点击事件 */
+        }
+
+        /* 左上角透明按钮 - 400x200 */
+        .transparent-button {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 200px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+            outline: none;
+        }
+
+        .transparent-button:hover {
+            background: rgba(0, 122, 255, 0.05);
+        }
+
+        .transparent-button:active {
+            background: rgba(0, 122, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景图片层 -->
+    <div class="background-image"></div>
+    
+    <!-- 背景遮罩层 -->
+    <div class="background-overlay"></div>
+
+    <!-- 主要内容区域 - 透明按钮覆盖层 -->
+    <div class="main-content">
+        <div class="transparent-buttons-container">
+            <!-- 左上角按钮 - 打开"万物高清放大(分块)seedVR2"模型详情页 -->
+            <button class="transparent-button" id="modelDetailBtn" title="万物高清放大(分块)seedVR2"></button>
+        </div>
+    </div>
+
+    <script>
+        // 检查背景图片是否加载成功
+        window.addEventListener('load', function() {
+            const bgImage = document.querySelector('.background-image');
+            if (bgImage) {
+                const img = new Image();
+                img.onload = function() {
+                    console.log('背景图片加载成功: ai-detail-background.jpg');
+                };
+                img.onerror = function() {
+                    console.error('背景图片加载失败，请检查文件路径：ai-detail-background.jpg');
+                    // 如果图片加载失败，显示备用背景
+                    bgImage.style.backgroundImage = 'none';
+                };
+                img.src = './ai-detail-background.jpg';
+            }
+        });
+
+        // 为左上角按钮添加点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const modelDetailBtn = document.getElementById('modelDetailBtn');
+            if (modelDetailBtn) {
+                modelDetailBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // 打开模型详情页，新窗口打开
+                    const modelName = '万物高清放大(分块)seedVR2';
+                    const url = `ai-apps-model-detail.html?name=${encodeURIComponent(modelName)}`;
+                    window.open(url, '_blank');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

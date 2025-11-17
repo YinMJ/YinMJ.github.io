@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI应用API详情 - RunningHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="model-detail.css?v=20251050">
+    <link rel="stylesheet" href="standard-models-fixed.css?v=20251038">
+    <style>
+        .ai-apps-content {
+            padding: 40px 0;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1d1d1f;
+            letter-spacing: -0.005em;
+        }
+        
+        .section-intro {
+            color: #6e6e73;
+            font-size: 17px;
+            margin-bottom: 40px;
+            line-height: 1.47059;
+            letter-spacing: -0.022em;
+        }
+        
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+        
+        .app-card {
+            background: #ffffff;
+            border: 0.5px solid #e5e5e7;
+            border-radius: 20px;
+            padding: 32px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .app-card:hover {
+            border-color: #007aff;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .app-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .app-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #007aff, #5ac8fa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+        }
+        
+        .app-card-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin: 0;
+            letter-spacing: -0.003em;
+        }
+        
+        .app-card-description {
+            color: #6e6e73;
+            font-size: 15px;
+            line-height: 1.47059;
+            margin-bottom: 20px;
+            flex: 1;
+            min-height: 60px;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #f5f5f7;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 0.5px solid #e5e5e7;
+            margin-bottom: 16px;
+        }
+        
+        .video-container iframe,
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+        
+        .custom-video-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+        
+        .custom-video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+        
+        .custom-video-wrapper:hover .video-controls {
+            opacity: 1;
+        }
+        
+        .video-control-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            color: #1d1d1f;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .video-control-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+        }
+        
+        .video-control-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #5a6b7f;
+            gap: 12px;
+        }
+        
+        .video-placeholder i {
+            font-size: 48px;
+            opacity: 0.5;
+        }
+        
+        .video-placeholder-text {
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .app-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 0.5px solid #e5e5e7;
+            margin-top: auto;
+        }
+        
+        .learn-more {
+            color: #007aff;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.2s ease;
+        }
+        
+        .app-card:hover .learn-more {
+            gap: 10px;
+        }
+        
+        /* 对比链接样式 */
+        .title-side .link-comparison {
+            color: #007aff;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .title-side .link-comparison::after {
+            content: '→';
+            font-size: 18px;
+            transition: transform 0.2s ease;
+        }
+        
+        .title-side .link-comparison:hover {
+            color: #0051d5;
+            border-bottom-color: #007aff;
+        }
+        
+        .title-side .link-comparison:hover::after {
+            transform: translateX(4px);
+        }
+
+        /* 核心内容区域样式（使用 standard-models 的样式） */
+        .content-section {
+            padding: 60px 0;
+            background: var(--rh-bg);
+        }
+
+        .content-section .category-section {
+            position: relative;
+            margin-bottom: 60px;
+            padding: 0 40px;
+        }
+
+        .content-section .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .content-section .category-title-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--rh-text);
+            letter-spacing: -0.003em;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-section .category-title-btn:hover {
+            color: var(--rh-primary);
+        }
+
+        .content-section .category-title-btn i {
+            font-size: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .content-section .category-title-btn:hover i {
+            transform: translateX(4px);
+        }
+
+        .content-section .models-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            gap: 24px;
+            position: relative;
+        }
+
+        .content-section .models-grid .model-card {
+            flex: 0 0 auto;
+            width: 280px;
+            min-width: 280px;
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+            min-height: 400px;
+        }
+
+        .content-section .model-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            border-color: var(--rh-primary);
+        }
+
+        .content-section .card-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #f5f5f7 0%, #e5e5e7 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        .content-section .card-background img,
+        .content-section .card-background video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            z-index: 0;
+        }
+
+        .content-section .card-overlay {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .content-section .card-image {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            color: var(--rh-muted);
+            font-size: 14px;
+            overflow: visible;
+            flex-shrink: 0;
+            background: transparent;
+            z-index: 5;
+        }
+
+        .content-section .favorite-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 0.5px solid var(--rh-border);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--rh-muted);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .content-section .favorite-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: var(--rh-border);
+            color: var(--rh-muted);
+            transform: scale(1.05);
+        }
+
+        .content-section .favorite-btn.favorited {
+            background: rgba(255, 59, 48, 0.9);
+            border-color: #ff3b30;
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        .content-section .favorite-btn.favorited:hover {
+            background: rgba(255, 59, 48, 1);
+            transform: scale(1.1);
+        }
+
+        .content-section .card-content {
+            padding: 12px 18px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            height: auto;
+            min-height: 140px;
+            max-height: 150px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-section .model-card:hover .card-content {
+            max-height: 100%;
+        }
+
+        .content-section .api-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0;
+            margin-top: 4px;
+            line-height: 1.3;
+            flex-shrink: 0;
+        }
+
+        .content-section .category-tag {
+            display: inline-block;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--rh-primary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .content-section .model-card:hover .category-tag {
+            opacity: 1;
+            max-height: 50px;
+            margin-bottom: 10px;
+        }
+
+        .content-section .description {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+            margin-bottom: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            opacity: 0;
+            max-height: 0;
+        }
+
+        .content-section .model-card:hover .description {
+            opacity: 1;
+            max-height: 60px;
+            margin-bottom: 14px;
+        }
+
+        .content-section .price-row {
+            margin: 6px 0;
+            padding: 0;
+            font-size: 13px;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .content-section .price-row .price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ff3b30;
+        }
+
+        .content-section .footer-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .content-section .run-count {
+            color: #ff3b30;
+            font-weight: 500;
+        }
+
+        .content-section .source {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+        }
+
+        /* 轮播控制 */
+        .content-section .carousel-controls {
+            pointer-events: none;
+        }
+
+        .content-section .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 0.5px solid var(--rh-border);
+            color: var(--rh-text);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            pointer-events: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-section .carousel-btn:hover {
+            background: var(--rh-surface);
+            color: var(--rh-primary);
+            border-color: var(--rh-primary);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .content-section .carousel-prev {
+            left: -20px;
+        }
+
+        .content-section .carousel-next {
+            right: -20px;
+        }
+        
+        /* 对比弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 0.5px solid #e5e5e7;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            border-bottom: 0.5px solid #e5e5e7;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: #1d1d1f;
+            letter-spacing: -0.003em;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #6e6e73;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1d1d1f;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        /* 第一部分：平台API类型卡片样式 */
+        .api-types-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 0.5px solid #e5e5e7;
+        }
+
+        .api-type-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        @media (max-width: 1024px) {
+            .api-type-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .api-type-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .api-type-card {
+            background: #ffffff;
+            border: 0.5px solid #e5e5e7;
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .api-type-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .api-type-card.card-member::before {
+            background: linear-gradient(90deg, #60a5fa, #ffffff);
+        }
+
+        .api-type-card.card-shared::before {
+            background: linear-gradient(90deg, #fb923c, #ffffff);
+        }
+
+        .api-type-card.card-exclusive::before {
+            background: linear-gradient(90deg, #fb923c, #ffffff);
+        }
+
+        .api-type-card.card-thirdparty::before {
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+        }
+
+        .api-type-card:hover::before {
+            opacity: 1;
+        }
+
+        .api-type-card:hover {
+            border-color: #007aff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+        
+        .api-type-card h5 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin: 0 0 12px 0;
+        }
+        
+        .api-type-card p {
+            font-size: 15px;
+            color: #6e6e73;
+            line-height: 1.47059;
+            margin: 0 0 20px 0;
+        }
+
+        .card-btn {
+            width: 100%;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card-btn.btn-blue {
+            background: linear-gradient(135deg, #60a5fa, #ffffff);
+            color: #1e293b;
+        }
+
+        .card-btn.btn-orange {
+            background: linear-gradient(135deg, #fb923c, #ffffff);
+            color: #1e293b;
+        }
+
+        .card-btn.btn-purple {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            color: #ffffff;
+        }
+
+        .card-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 第二部分：平台API权益对比表格样式 */
+        .api-comparison-section {
+            margin-top: 32px;
+        }
+
+        .comparison-table {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 0.5px solid #e5e5e7;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 0.5px solid #e5e5e7;
+            font-size: 14px;
+        }
+        
+        .comparison-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #1d1d1f;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+            min-width: 180px;
+        }
+
+        .comparison-table th:first-child {
+            min-width: 160px;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .comparison-table td:first-child {
+            font-weight: 600;
+            color: #1d1d1f;
+            background: #fafafa;
+            min-width: 160px;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            white-space: nowrap;
+        }
+        
+        .comparison-table td {
+            color: #6e6e73;
+            line-height: 1.47059;
+            vertical-align: top;
+        }
+
+        .comparison-table td strong {
+            color: #1d1d1f;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 24px;
+            }
+            
+        }
+
+        /* 搜索区域样式 */
+        .search-section {
+            padding: 24px 0;
+            background: var(--rh-surface);
+            border-bottom: 0.5px solid var(--rh-border);
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 1000px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            background: var(--rh-surface);
+            border: 0.5px solid var(--rh-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--rh-muted);
+            z-index: 1;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px 16px 14px 48px;
+            border: none;
+            font-size: 16px;
+            background: transparent;
+            color: var(--rh-text);
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: var(--rh-muted);
+        }
+
+        .search-box:focus-within {
+            border-color: var(--rh-primary);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .search-box .btn-view-all {
+            padding: 12px 20px;
+            background: rgba(29, 29, 31, 0.8);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .search-box .btn-view-all:hover {
+            background: rgba(29, 29, 31, 0.95);
+            transform: scale(1.02);
+        }
+
+        .search-suggestions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .suggest-label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .suggestion-tag {
+            background: var(--rh-surface-2);
+            border: 1px solid var(--rh-border);
+            color: var(--rh-muted);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-tag:hover {
+            background: var(--rh-primary);
+            border-color: var(--rh-primary);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                padding: 0 16px;
+            }
+
+            .search-box .btn-view-all {
+                font-size: 12px;
+                padding: 10px 16px;
+            }
+
+            .search-suggestions {
+                gap: 6px;
+            }
+
+            .suggestion-tag {
+                font-size: 11px;
+                padding: 3px 10px;
+            }
+        }
+    </style>
+</head>
+<body class="model-detail-page">
+    <!-- 顶部导航 -->
+    <header class="detail-header">
+        <div class="container">
+            <div class="brand">
+                <span class="logo-icon">R</span>
+                <span class="brand-name">RunningHUB</span>
+            </div>
+            <div class="header-actions">
+                <div class="dropdown-wrapper">
+                    <button class="btn small dropdown-btn" data-dropdown="sdk">
+                        其他SDK下载
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="sdk-dropdown">
+                        <a href="https://github.com/HM-RunningHub" target="_blank" class="dropdown-item">Github</a>
+                        <a href="https://github.com/HM-RunningHub/RH_CozeSDK" target="_blank" class="dropdown-item">Coze SDK</a>
+                        <a href="https://github.com/HM-RunningHub/ComfyUI_RH_APICall" target="_blank" class="dropdown-item">ComfyUI插件</a>
+                        <a href="https://github.com/zombieyang/sd-ppp" target="_blank" class="dropdown-item">SD-PPP</a>
+                    </div>
+                </div>
+                <button class="btn primary small">
+                    进入控制台
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div class="header-icons">
+                    <button class="detail-nav-btn" title="联系">
+                        <i class="fas fa-headset"></i>
+                    </button>
+                    <button class="detail-nav-btn" title="通知">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="detail-nav-btn" title="黄钻">
+                        <i class="fas fa-gem"></i>
+                    </button>
+                    <button class="detail-nav-btn" title="用户中心">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 面包屑与标题 -->
+    <section class="detail-hero">
+        <div class="container hero-inner">
+            <div class="title-side">
+                <h1>AI 应用 API</h1>
+                <div class="meta">
+                    <span>调用现成的 AI 应用，直接复用完整功能</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主体内容 -->
+    <main class="detail-main container">
+        <div class="ai-apps-content">
+            <h2 class="section-title">选择适合的应用类型</h2>
+            <p class="section-intro">
+                AI应用API提供了多种类型的应用服务，从基础工具到专业创作，满足不同场景下的业务需求。
+                每个应用都经过优化配置，可直接调用，快速集成到您的系统中。
+            </p>
+
+            <div class="apps-grid">
+                <!-- 普通AI应用 -->
+                <div class="app-card" data-app-type="normal">
+                    <div class="app-card-header">
+                        <div class="app-card-icon">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <h3 class="app-card-title">普通AI应用</h3>
+                    </div>
+                    <p class="app-card-description">
+                        聚合电影级视频（Wan2.2）、多风格绘图（Flux/Qwen）、语音克隆、场景化创作（电商 / 影视 / 短视频）等全类型 AI 工具，覆盖专业与轻量化需求，零基础可快速调用。
+                    </p>
+                    <div class="video-container">
+                        <div class="custom-video-wrapper" id="normalAppsVideoWrapper">
+                            <video id="normalAppsVideo" preload="metadata" muted>
+                                <source src="video-normal-apps-api.mp4" type="video/mp4">
+                                <source src="video-normal-apps-api.webm" type="video/webm">
+                                您的浏览器不支持视频播放。
+                            </video>
+                            <div class="video-controls">
+                                <button class="video-control-btn" id="normalAppsPlayPauseBtn" title="播放/暂停">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="video-control-btn" id="normalAppsMuteBtn" title="声音开/关">
+                                    <i class="fas fa-volume-mute"></i>
+                                </button>
+                                <button class="video-control-btn" id="normalAppsFullscreenBtn" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-card-footer">
+                        <span class="learn-more">
+                            了解更多
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 快捷创作 -->
+                <div class="app-card" data-app-type="quick">
+                    <div class="app-card-header">
+                        <div class="app-card-icon" style="background: linear-gradient(135deg, #10b981, #3b82f6);">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <h3 class="app-card-title">快捷创作</h3>
+                    </div>
+                    <p class="app-card-description">
+                        集成 Vidu Q2、Soro2、WAN2.2、Flux、Qwen 等多类生图 / 生视频工具，支持文生、图生模式，可快速生成图片、视频内容，满足创意快速落地需求。
+                    </p>
+                    <div class="video-container">
+                        <div class="custom-video-wrapper" id="quickCreateVideoWrapper">
+                            <video id="quickCreateVideo" preload="metadata" muted>
+                                <source src="video-quick-create-api.mp4" type="video/mp4">
+                                <source src="video-quick-create-api.webm" type="video/webm">
+                                您的浏览器不支持视频播放。
+                            </video>
+                            <div class="video-controls">
+                                <button class="video-control-btn" id="quickCreatePlayPauseBtn" title="播放/暂停">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="video-control-btn" id="quickCreateMuteBtn" title="声音开/关">
+                                    <i class="fas fa-volume-mute"></i>
+                                </button>
+                                <button class="video-control-btn" id="quickCreateFullscreenBtn" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-card-footer">
+                        <span class="learn-more">
+                            了解更多
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 模型创作 -->
+                <div class="app-card" data-app-type="creation">
+                    <div class="app-card-header">
+                        <div class="app-card-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+                            <i class="fas fa-paint-brush"></i>
+                        </div>
+                        <h3 class="app-card-title">模型创作</h3>
+                    </div>
+                    <p class="app-card-description">
+                        专业的AI创作工作台，提供图像和视频生成能力。支持文生图、图生图、文生视频、图生视频等多种创作模式。
+                        内置丰富的模型库和LoRA微调功能，可灵活配置采样方法、调度器、步数、种子等参数，满足不同创作需求。
+                    </p>
+                    <div class="video-container">
+                        <div class="custom-video-wrapper" id="modelCreateVideoWrapper">
+                            <video id="modelCreateVideo" preload="metadata" muted>
+                                <source src="video-model-create-api.mp4" type="video/mp4">
+                                <source src="video-model-create-api.webm" type="video/webm">
+                                您的浏览器不支持视频播放。
+                            </video>
+                            <div class="video-controls">
+                                <button class="video-control-btn" id="modelCreatePlayPauseBtn" title="播放/暂停">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="video-control-btn" id="modelCreateMuteBtn" title="声音开/关">
+                                    <i class="fas fa-volume-mute"></i>
+                                </button>
+                                <button class="video-control-btn" id="modelCreateFullscreenBtn" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-card-footer">
+                        <span class="learn-more">
+                            了解更多
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 搜索区域 -->
+    <section class="search-section">
+        <div class="container">
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="按应用、任务、类别等进行搜索" id="searchInput">
+                    <button class="btn-view-all" id="viewAllBtn">查看所有AI应用API</button>
+                </div>
+                <div class="search-suggestions">
+                    <span class="suggest-label">Try:</span>
+                    <button class="suggestion-tag">Newest image to video models</button>
+                    <button class="suggestion-tag">Flux Kontext</button>
+                    <button class="suggestion-tag">Generate 3D model</button>
+                    <button class="suggestion-tag">Create music</button>
+                    <button class="suggestion-tag">Remove background</button>
+                    <button class="suggestion-tag">Upscale</button>
+                    <button class="suggestion-tag">Training</button>
+                    <button class="suggestion-tag">Try on clothing</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心内容区域 -->
+    <section class="content-section" style="background: var(--rh-bg); padding: 60px 0;">
+        <div class="container" style="max-width: 1600px; margin: 0 auto; padding: 0 24px;">
+            <!-- 普通AI应用 -->
+            <div class="category-section">
+                <div class="category-header">
+                    <button class="category-title-btn" data-category="普通AI应用">
+                        <span>普通AI应用</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="carousel-controls">
+                    <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                    <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="models-grid" id="aiAppsGrid">
+                    <!-- 模型卡片将通过 JavaScript 动态加载 -->
+                </div>
+            </div>
+
+            <!-- 快捷创作 -->
+            <div class="category-section">
+                <div class="category-header">
+                    <button class="category-title-btn" data-category="快捷创作">
+                        <span>快捷创作</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="carousel-controls">
+                    <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                    <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="models-grid" id="quickCreationGrid">
+                    <!-- 模型卡片将通过 JavaScript 动态加载 -->
+                </div>
+            </div>
+
+            <!-- 模型创作 -->
+            <div class="category-section">
+                <div class="category-header">
+                    <button class="category-title-btn" data-category="模型创作">
+                        <span>模型创作</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="carousel-controls">
+                    <button class="carousel-btn carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                    <button class="carousel-btn carousel-next"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="models-grid" id="modelCreationGrid">
+                    <!-- 模型卡片将通过 JavaScript 动态加载 -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API对比弹窗 -->
+    <div class="modal" id="comparisonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>API KEY类型及权益对比</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 第一部分：平台API类型 -->
+                <div class="api-types-section">
+                    <h4 class="section-title">API KEY 类型</h4>
+                    <div class="api-type-cards">
+                        <div class="api-type-card card-member">
+                            <h5>消费级-会员API</h5>
+                            <p>该API适合个人和小团队使用。基础版支持1并发，专业版支持3并发，专业Plus版支持5并发。基于强大的ComfyUI环境，支持7*24小时稳定运行和高效工作流，满足小规模创作需求。</p>
+                            <button class="card-btn btn-blue">去开通</button>
+                        </div>
+                        <div class="api-type-card card-shared">
+                            <h5>企业级-共享API</h5>
+                            <p>该共享API基于RH公共资源池，提供弹性调用服务，默认并发为50，按实际使用计费。用户可以灵活调用各类工作流，按需扩展调用规模。适合日常业务接入、批量处理、阶段性增长等场景，平衡灵活性与成本效益。</p>
+                            <button class="card-btn btn-orange">去充值</button>
+                        </div>
+                        <div class="api-type-card card-exclusive">
+                            <h5>企业级-独占API</h5>
+                            <p>该独占API为性能敏感或大规模生产环境提供专用计算资源。通过独立租用GPU算力，用户可以享受固定并发和稳定响应速度。特别适合对高并发、低延迟、稳定性要求严格的核心业务场景。</p>
+                            <button class="card-btn btn-orange">去开通</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二部分：平台API权益对比 -->
+                <div class="api-comparison-section">
+                    <h4 class="section-title">API KEY 权益对比</h4>
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>消费级-会员API</th>
+                                    <th>企业级-共享API</th>
+                                    <th>企业级-独占API</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>适用场景</strong></td>
+                                    <td>个人或团队内部使用</td>
+                                    <td>商业场景灵活调用，按需使用</td>
+                                    <td>高并发生产、性能敏感场景</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GPU 资源池</strong></td>
+                                    <td>共享资源池</td>
+                                    <td>共享资源池</td>
+                                    <td>独占资源池</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GPU 类型</strong></td>
+                                    <td>90系列 24G/48G</td>
+                                    <td>90系列 24G/48G</td>
+                                    <td>90系列 24G/48G</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>充值模式</strong></td>
+                                    <td>会员套餐</td>
+                                    <td>钱包预充值</td>
+                                    <td>独占套餐</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>计费模式</strong></td>
+                                    <td>会员权益，消耗RH币</td>
+                                    <td>消耗钱包余额，按运行时长计费</td>
+                                    <td>周期性租用，不限调用次数</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>定价</strong></td>
+                                    <td>同会员套餐</td>
+                                    <td>模型创作和快捷创作（专用GPU）¥2.5/小时，按秒计费；标准运行（90系列 24G）¥4/小时，按秒计费；Plus运行（90系列 48G）¥6/小时，按秒计费。注：多并发任务时，成本按累计运行时长计算，不使用不收费</td>
+                                    <td>独占（90系列 24G显存）¥1500/路/月；独占Plus（90系列 48G显存）¥2250/路/月</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>API 并发数</strong></td>
+                                    <td>同会员权益</td>
+                                    <td>默认50，提升并发请联系：jason@runninghub.ai</td>
+                                    <td>任务并发数等于购买的GPU数量</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>高速队列</strong></td>
+                                    <td>会员高速队列</td>
+                                    <td>企业级高速队列</td>
+                                    <td>企业级高速队列</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>主要优势</strong></td>
+                                    <td>个人使用高性价比</td>
+                                    <td>弹性灵活高并发商业场景</td>
+                                    <td>独占算力，累积缓存，运行速度快且稳定</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>页面任务权益</strong></td>
+                                    <td>同会员权益</td>
+                                    <td>无</td>
+                                    <td>见独占套餐产品说明</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>并存关系</strong></td>
+                                    <td>可同时开启共享API</td>
+                                    <td>可同时开启会员或独占API</td>
+                                    <td>可同时开启共享API</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>缓存说明</strong></td>
+                                    <td colspan="3">
+                                        <div style="line-height: 1.8;">
+                                            存在缓存时，任务运行时长将大幅减少<br><br>
+                                            共享资源池：任务在资源池内调度；如调度到不同机器，可能出现无缓存运行，导致运行时长增加<br><br>
+                                            独占资源池：相同工作流连续运行时，缓存状态会保持；一旦切换工作流，缓存将被清空。如需始终保持缓存，当前可通过多个账号绑定独立工作流实现
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 为应用卡片添加点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const appCards = document.querySelectorAll('.app-card');
+            
+            appCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const appType = this.getAttribute('data-app-type');
+                    const appTitle = this.querySelector('.app-card-title').textContent;
+                    
+                    // 根据应用类型跳转到对应的页面
+                    let targetUrl = '';
+                    switch(appType) {
+                        case 'normal':
+                            targetUrl = 'ai-applications.html';
+                            break;
+                        case 'quick':
+                            targetUrl = 'https://www.runninghub.cn/quick-create';
+                            break;
+                        case 'creation':
+                            targetUrl = 'https://www.runninghub.cn/model-cology';
+                            break;
+                    }
+
+                    if (targetUrl) {
+                        window.open(targetUrl, '_blank');
+                    }
+                });
+            });
+            
+            // 对比弹窗交互
+            const comparisonModal = document.getElementById('comparisonModal');
+            const modalClose = comparisonModal?.querySelector('.modal-close');
+            
+            if (modalClose && comparisonModal) {
+                modalClose.addEventListener('click', function() {
+                    comparisonModal.classList.remove('show');
+                });
+            }
+            
+            if (comparisonModal) {
+                comparisonModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('show');
+                    }
+                });
+            }
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && comparisonModal?.classList.contains('show')) {
+                    comparisonModal.classList.remove('show');
+                }
+            });
+            
+            // 搜索功能
+            const searchInput = document.getElementById('searchInput');
+            const suggestionTags = document.querySelectorAll('.suggestion-tag');
+            const viewAllBtn = document.getElementById('viewAllBtn');
+            
+            // 搜索框获得焦点时，跳转到全量内容搜索页
+            if (searchInput) {
+                searchInput.addEventListener('focus', function() {
+                    // 跳转到全量内容搜索页
+                    window.location.href = 'all-ai-apps.html';
+                });
+                
+                // 阻止默认的输入行为（因为点击就会跳转）
+                searchInput.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.focus();
+                });
+            }
+            
+            // 建议标签点击：跳转到全量内容搜索页并自动搜索
+            suggestionTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const query = this.textContent.trim();
+                    // 跳转到全量内容搜索页，并传递搜索关键词
+                    window.location.href = `all-ai-apps.html?q=${encodeURIComponent(query)}`;
+                });
+            });
+            
+            // 查看所有按钮
+            if (viewAllBtn) {
+                viewAllBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // 跳转到所有AI应用API页面
+                    window.location.href = 'all-ai-apps.html';
+                });
+            }
+        });
+        
+        // 搜索过滤函数
+        function filterModelsBySearch(query) {
+            const allCards = document.querySelectorAll('.content-section .model-card');
+            const searchQuery = query.toLowerCase();
+            
+            allCards.forEach(card => {
+                const cardName = card.querySelector('.api-name')?.textContent.toLowerCase() || '';
+                const cardDescription = card.querySelector('.description')?.textContent.toLowerCase() || '';
+                const cardCategory = card.querySelector('.category-tag')?.textContent.toLowerCase() || '';
+                
+                const matches = cardName.includes(searchQuery) || 
+                              cardDescription.includes(searchQuery) || 
+                              cardCategory.includes(searchQuery);
+                
+                if (matches) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // 显示所有模型
+        function showAllModels() {
+            const allCards = document.querySelectorAll('.content-section .model-card');
+            allCards.forEach(card => {
+                card.style.display = 'block';
+            });
+        }
+    </script>
+
+    <script src="api-data.js"></script>
+    <script src="standard-models.js"></script>
+    <script>
+        // 修复 viewAllBtn 按钮的跳转（standard-models.js 会覆盖我们的绑定）
+        // 在 standard-models.js 加载后重新绑定
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等待 standard-models.js 执行完成后再重新绑定
+            setTimeout(function() {
+                const viewAllBtn = document.getElementById('viewAllBtn');
+                if (viewAllBtn) {
+                    // 移除旧的事件监听器（通过克隆节点）
+                    const newBtn = viewAllBtn.cloneNode(true);
+                    viewAllBtn.parentNode.replaceChild(newBtn, viewAllBtn);
+                    
+                    // 重新绑定正确的事件
+                    newBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // 跳转到所有AI应用API页面
+                        window.location.href = 'all-ai-apps.html';
+                    });
+                }
+            }, 200);
+        });
+        
+        // AI应用详情页面的模型卡片数据
+        const aiAppsDetailModels = {
+            '普通AI应用': [
+                { name: '万物高清放大(分块)seedVR2', taskType: 'Image to Image', description: '支持分块处理的高清图像放大模型，使用seedVR2技术', runCount: 18000, source: { channelName: '官方' } },
+                { name: 'Viduq2 多张参考生视频(角色一致性)', taskType: 'Image to Video', description: '支持多张参考图生成视频，保持角色一致性', runCount: 15000, source: { channelName: '官方' } },
+                { name: 'RH Veo3.1 Image2Video', taskType: 'Image to Video', description: '基于Veo 3.1的图像转视频模型', runCount: 32000, source: { channelName: '官方' } },
+                { name: '即梦AI-图生视频3.0 PRO', taskType: 'Image to Video', description: '即梦AI最新版本的图生视频模型', runCount: 8500, source: { channelName: '官方' } },
+                { name: 'Qwen ——影视剧情分镜制作（ai短剧）', taskType: 'Text to Video', description: '专为影视分镜和短剧制作设计的AI模型', runCount: 12000, source: { channelName: '官方' } },
+                { name: 'Qwen文生图-卡通，国风，游戏，渲染人物风格加强', taskType: 'Text to Image', description: '支持多种风格的文生图模型', runCount: 28000, source: { channelName: '官方' } },
+                { name: 'Q版打工人表情包', taskType: 'Text to Image', description: '生成Q版打工人风格的表情包', runCount: 5600, source: { channelName: '官方' } }
+            ],
+            '快捷创作': [
+                { name: 'Nano', taskType: 'Text to Image', description: '快速图像生成模型', runCount: 45000, source: { channelName: '官方' } },
+                { name: 'Sor02 文生视频', taskType: 'Text to Video', description: 'Sora 2文本生成视频模型', runCount: 38000, source: { channelName: '官方' } },
+                { name: 'Sor02 图生视频', taskType: 'Image to Video', description: 'Sora 2图像生成视频模型', runCount: 35000, source: { channelName: '官方' } },
+                { name: 'WAN2.2 文生视频', taskType: 'Text to Video', description: 'WAN 2.2文本生成视频模型', runCount: 22000, source: { channelName: '官方' } },
+                { name: 'WAN2.2 图生视频', taskType: 'Image to Video', description: 'WAN 2.2图像生成视频模型', runCount: 18000, source: { channelName: '官方' } },
+                { name: 'Flux 文生图', taskType: 'Text to Image', description: 'Flux文本生成图像模型', runCount: 52000, source: { channelName: '官方' } },
+                { name: 'Qwen 文生图', taskType: 'Text to Image', description: 'Qwen文本生成图像模型', runCount: 31000, source: { channelName: '官方' } },
+                { name: '参考生图-P图', taskType: 'Image to Image', description: '基于参考图的图像编辑和生成', runCount: 14000, source: { channelName: '官方' } }
+            ],
+            '模型创作': [
+                { name: 'qwen_image_fp8_e4m3fn', taskType: 'Text to Image', description: 'Qwen图像生成模型FP8优化版本', runCount: 8900, source: { channelName: '官方' } },
+                { name: 'daouoomeu_xusnxu', taskType: 'Text to Image', description: '专业图像生成模型', runCount: 7200, source: { channelName: '官方' } },
+                { name: 'WAN2.2', taskType: 'Text to Video', description: 'WAN 2.2视频生成模型', runCount: 25000, source: { channelName: '官方' } }
+            ]
+        };
+
+        // 判断模型类型（是否为三方模型API）
+        function isThirdPartyModel(model) {
+            // 优先使用 modelType 字段
+            if (model.modelType === 'thirdParty') {
+                return true;
+            }
+            if (model.modelType === 'own') {
+                return false;
+            }
+            // 如果没有 modelType 字段，根据来源判断
+            if (model.source && model.source.channelName) {
+                const channelName = model.source.channelName;
+                return channelName === '三方' || 
+                       channelName === '第三方' ||
+                       (model.name && (model.name.includes('Qwen') || model.name.includes('即梦AI')));
+            }
+            return false;
+        }
+
+        // 创建模型卡片HTML（与 all-ai-apps.html 完全一致）
+        function createModelCard(model, index) {
+            // 根据模型类型设置价格描述
+            const isThirdParty = isThirdPartyModel(model);
+            const priceDisplay = isThirdParty 
+                ? '三方API调用费用+运行时长消耗费用'
+                : '运行时长消耗费用';
+            const runCountFormatted = formatNumber(model.runCount || 0);
+            
+            // 根据模型名称生成背景图片路径
+            const backgroundImagePath = `images/${model.name}-bg-0.png`;
+            
+            return `
+                <div class="model-card" data-api-id="${index}" style="cursor: pointer;">
+                    <div class="card-background">
+                        <img src="${backgroundImagePath}" alt="${model.name} background" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.style.display='none';" onload="this.style.display='block';">
+                    </div>
+                    <div class="card-overlay">
+                        <div class="card-image">
+                            <button class="favorite-btn"><i class="fas fa-star"></i></button>
+                        </div>
+                        <div class="card-content">
+                            <div class="footer-info">
+                                <span class="run-count">${runCountFormatted} runs</span>
+                                <span class="source">${model.source.channelName}</span>
+                            </div>
+                            <div class="price-row">${priceDisplay}</div>
+                            <h4 class="api-name">${model.name}</h4>
+                            <div class="category-tag">${model.taskType || '未知'}</div>
+                            <p class="description">${model.description || '暂无描述'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 格式化数字
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // 渲染模型卡片
+        function renderModels() {
+            // 普通AI应用
+            const aiAppsGrid = document.getElementById('aiAppsGrid');
+            if (aiAppsGrid && aiAppsDetailModels['普通AI应用']) {
+                aiAppsGrid.innerHTML = aiAppsDetailModels['普通AI应用'].map((model, index) => 
+                    createModelCard(model, `ai-app-${index}`)
+                ).join('');
+            }
+
+            // 快捷创作
+            const quickCreationGrid = document.getElementById('quickCreationGrid');
+            if (quickCreationGrid && aiAppsDetailModels['快捷创作']) {
+                quickCreationGrid.innerHTML = aiAppsDetailModels['快捷创作'].map((model, index) => 
+                    createModelCard(model, `quick-${index}`)
+                ).join('');
+            }
+
+            // 模型创作
+            const modelCreationGrid = document.getElementById('modelCreationGrid');
+            if (modelCreationGrid && aiAppsDetailModels['模型创作']) {
+                modelCreationGrid.innerHTML = aiAppsDetailModels['模型创作'].map((model, index) => 
+                    createModelCard(model, `creation-${index}`)
+                ).join('');
+            }
+
+            // 添加卡片点击事件
+            addCardClickEvents();
+        }
+
+        // 添加卡片点击事件（与 all-ai-apps.html 完全一致）
+        function addCardClickEvents() {
+            const cards = document.querySelectorAll('.content-section .model-card');
+            cards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // 如果点击的是收藏按钮，不跳转
+                    if (e.target.closest('.favorite-btn')) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const btn = e.target.closest('.favorite-btn');
+                        btn.classList.toggle('favorited');
+                        return;
+                    }
+                    
+                    // 跳转到模型详情页（新窗口）
+                    const apiId = card.getAttribute('data-api-id');
+                    const modelName = card.querySelector('.api-name')?.textContent;
+                    if (apiId && modelName) {
+                        window.open(`ai-apps-model-detail.html?name=${encodeURIComponent(modelName)}&id=${encodeURIComponent(apiId)}`, '_blank');
+                    }
+                });
+            });
+        }
+
+        // 轮播控制（完整版，使用闭包保存状态）
+        function setupCarousel() {
+            const categorySections = document.querySelectorAll('.content-section .category-section');
+            console.log(`setupCarousel: 找到 ${categorySections.length} 个分类区域`);
+            
+            if (categorySections.length === 0) {
+                console.warn('setupCarousel: 没有找到任何分类区域');
+                return;
+            }
+            
+            categorySections.forEach((section, index) => {
+                const prevBtn = section.querySelector('.carousel-prev');
+                const nextBtn = section.querySelector('.carousel-next');
+                const modelsGrid = section.querySelector('.models-grid');
+                const categoryTitleBtn = section.querySelector('.category-title-btn');
+                const categoryTitle = categoryTitleBtn?.getAttribute('data-category');
+                
+                console.log(`分类 ${index + 1}: ${categoryTitle}, modelsGrid: ${modelsGrid ? '存在' : '不存在'}`);
+                
+                if (!modelsGrid || !categoryTitle) {
+                    console.warn(`分类 ${categoryTitle} 缺少必要元素，跳过`);
+                    return;
+                }
+                
+                // 检查数据是否存在
+                if (typeof aiAppsDetailModels === 'undefined') {
+                    console.error('aiAppsDetailModels 数据不存在，无法设置轮播');
+                    return;
+                }
+                
+                const categoryModels = aiAppsDetailModels[categoryTitle] || [];
+                console.log(`分类 ${categoryTitle} 有 ${categoryModels.length} 个模型`);
+                const pageSize = 5; // 每页显示5个卡片
+                
+                // 使用闭包保存当前页状态
+                let currentPage = 0;
+                
+                // 初始化箭头显示状态
+                function updateArrows() {
+                    const totalPages = Math.max(1, Math.ceil(categoryModels.length / pageSize));
+                    
+                    if (categoryModels.length > pageSize) {
+                        if (prevBtn) {
+                            prevBtn.style.display = 'flex';
+                            const isFirstPage = currentPage <= 0;
+                            prevBtn.disabled = isFirstPage;
+                            prevBtn.style.opacity = isFirstPage ? '0.4' : '1';
+                            prevBtn.style.cursor = isFirstPage ? 'not-allowed' : 'pointer';
+                        }
+                        if (nextBtn) {
+                            nextBtn.style.display = 'flex';
+                            const isLastPage = currentPage >= totalPages - 1;
+                            nextBtn.disabled = isLastPage;
+                            nextBtn.style.opacity = isLastPage ? '0.4' : '1';
+                            nextBtn.style.cursor = isLastPage ? 'not-allowed' : 'pointer';
+                        }
+                    } else {
+                        if (prevBtn) prevBtn.style.display = 'none';
+                        if (nextBtn) nextBtn.style.display = 'none';
+                    }
+                }
+                
+                // 渲染当前页
+                function renderPage() {
+                    if (!modelsGrid) return;
+                    
+                    const start = currentPage * pageSize;
+                    const end = start + pageSize;
+                    const pageModels = categoryModels.slice(start, end);
+                    
+                    // 确保 modelsGrid 可见（强制设置，防止被覆盖）
+                    modelsGrid.style.setProperty('display', 'flex', 'important');
+                    modelsGrid.style.setProperty('visibility', 'visible', 'important');
+                    modelsGrid.style.setProperty('opacity', '1', 'important');
+                    modelsGrid.style.removeProperty('height'); // 移除可能的高度限制
+                    
+                    modelsGrid.innerHTML = pageModels.map((model, index) => 
+                        createModelCard(model, `${categoryTitle.toLowerCase().replace(/\s+/g, '-')}-${start + index}`)
+                    ).join('');
+                    
+                    // 强制触发重排，确保DOM更新
+                    modelsGrid.offsetHeight;
+                    
+                    // 确保所有子卡片也可见
+                    const cards = modelsGrid.querySelectorAll('.model-card');
+                    cards.forEach(card => {
+                        card.style.setProperty('display', 'block', 'important');
+                        card.style.setProperty('visibility', 'visible', 'important');
+                        card.style.setProperty('opacity', '1', 'important');
+                    });
+                    
+                    addCardClickEvents();
+                    updateArrows();
+                }
+                
+                // 初始化
+                renderPage();
+                
+                // 绑定箭头按钮事件
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (currentPage > 0) {
+                            currentPage--;
+                            renderPage();
+                        }
+                    });
+                }
+                
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const totalPages = Math.max(1, Math.ceil(categoryModels.length / pageSize));
+                        if (currentPage < totalPages - 1) {
+                            currentPage++;
+                            renderPage();
+                        }
+                    });
+                }
+                
+                // 绑定分类标题点击事件
+                if (categoryTitleBtn) {
+                    categoryTitleBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const catTitle = this.getAttribute('data-category') || categoryTitle;
+                        window.location.href = `ai-apps-category.html?category=${encodeURIComponent(catTitle)}`;
+                    });
+                }
+            });
+        }
+
+        // 视频播放控制函数（通用）
+        function setupVideoPlayer(videoId, wrapperId, playPauseBtnId, muteBtnId, fullscreenBtnId) {
+            const video = document.getElementById(videoId);
+            const videoWrapper = document.getElementById(wrapperId);
+            const playPauseBtn = document.getElementById(playPauseBtnId);
+            const muteBtn = document.getElementById(muteBtnId);
+            const fullscreenBtn = document.getElementById(fullscreenBtnId);
+            
+            if (!video || !videoWrapper) return;
+            
+            // 确保视频默认静音并预加载首帧
+            video.muted = true;
+            video.preload = 'metadata';
+            
+            // 播放/暂停按钮
+            if (playPauseBtn) {
+                playPauseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (video.paused) {
+                        video.play();
+                        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    } else {
+                        video.pause();
+                        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                });
+            }
+            
+            // 视频播放状态变化时更新按钮图标
+            video.addEventListener('play', function() {
+                if (playPauseBtn) {
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                }
+            });
+            
+            video.addEventListener('pause', function() {
+                if (playPauseBtn) {
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+            
+            // 声音开/关按钮
+            if (muteBtn) {
+                muteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    video.muted = !video.muted;
+                    if (video.muted) {
+                        muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                    } else {
+                        muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    }
+                });
+            }
+            
+            // 全屏按钮
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (!document.fullscreenElement) {
+                        if (videoWrapper.requestFullscreen) {
+                            videoWrapper.requestFullscreen();
+                        } else if (videoWrapper.webkitRequestFullscreen) {
+                            videoWrapper.webkitRequestFullscreen();
+                        } else if (videoWrapper.msRequestFullscreen) {
+                            videoWrapper.msRequestFullscreen();
+                        }
+                    } else {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen();
+                        }
+                    }
+                });
+            }
+            
+            // 全屏状态变化时更新按钮图标
+            function updateFullscreenIcon() {
+                if (fullscreenBtn) {
+                    if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+                        fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                    } else {
+                        fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                    }
+                }
+            }
+            
+            // 为每个视频播放器单独绑定全屏事件，更新各自的按钮图标
+            const fullscreenChangeHandler = function() {
+                updateFullscreenIcon();
+            };
+            
+            document.addEventListener('fullscreenchange', fullscreenChangeHandler);
+            document.addEventListener('webkitfullscreenchange', fullscreenChangeHandler);
+            document.addEventListener('msfullscreenchange', fullscreenChangeHandler);
+            
+            // Hover 时自动播放，移开时暂停
+            let hoverTimeout;
+            videoWrapper.addEventListener('mouseenter', function() {
+                hoverTimeout = setTimeout(function() {
+                    if (video.paused) {
+                        video.play().catch(function(error) {
+                            console.log('自动播放失败:', error);
+                        });
+                    }
+                }, 300); // 延迟300ms后播放，避免误触发
+            });
+            
+            videoWrapper.addEventListener('mouseleave', function() {
+                if (hoverTimeout) {
+                    clearTimeout(hoverTimeout);
+                }
+                // 鼠标离开时暂停播放
+                if (!video.paused) {
+                    video.pause();
+                }
+            });
+            
+            // 视频加载完成后显示首帧
+            video.addEventListener('loadedmetadata', function() {
+                video.currentTime = 0.1; // 设置到0.1秒，显示首帧
+                video.pause();
+            });
+        }
+
+        // 全局全屏退出事件处理，确保退出全屏后重新渲染模型卡片
+        let fullscreenExitHandler = null;
+        let isHandlingFullscreenExit = false; // 防止重复处理
+        
+        function handleFullscreenExit() {
+            // 防止重复处理
+            if (isHandlingFullscreenExit) return;
+            
+            // 检查是否真的退出全屏（所有全屏状态都为null）
+            const isFullscreen = document.fullscreenElement || 
+                                document.webkitFullscreenElement || 
+                                document.msFullscreenElement;
+            
+            if (!isFullscreen && !isHandlingFullscreenExit) {
+                isHandlingFullscreenExit = true;
+                
+                // 退出全屏后，延迟重新渲染，确保DOM已完全恢复
+                setTimeout(function() {
+                    try {
+                        console.log('开始重新渲染模型卡片...');
+                        
+                        // 检查数据是否存在
+                        if (typeof aiAppsDetailModels === 'undefined') {
+                            console.error('aiAppsDetailModels 数据不存在');
+                            return;
+                        }
+                        
+                        // 检查DOM元素是否存在
+                        const contentSection = document.querySelector('.content-section');
+                        if (!contentSection) {
+                            console.error('.content-section 元素不存在');
+                            return;
+                        }
+                        
+                        // 确保 DOM 可见性
+                        contentSection.style.display = '';
+                        contentSection.style.visibility = 'visible';
+                        contentSection.style.opacity = '1';
+                        
+                        // 先调用 renderModels 渲染所有卡片
+                        if (typeof renderModels === 'function') {
+                            console.log('调用 renderModels()...');
+                            renderModels();
+                        }
+                        
+                        // 然后调用 setupCarousel 设置分页
+                        if (typeof setupCarousel === 'function') {
+                            console.log('调用 setupCarousel()...');
+                            setupCarousel();
+                        }
+                        
+                        // 强制重新计算布局
+                        contentSection.offsetHeight; // 触发重排
+                        
+                        // 验证卡片是否真的渲染了
+                        const allCards = document.querySelectorAll('.content-section .model-card');
+                        console.log(`退出全屏后，模型卡片已重新渲染，共找到 ${allCards.length} 个卡片`);
+                        
+                        if (allCards.length === 0) {
+                            console.warn('警告：没有找到任何模型卡片，可能需要检查数据或DOM结构');
+                        }
+                    } catch (error) {
+                        console.error('退出全屏后重新渲染失败:', error);
+                        console.error(error.stack);
+                    } finally {
+                        isHandlingFullscreenExit = false;
+                    }
+                }, 300); // 增加延迟时间到300ms，确保全屏状态完全恢复
+            }
+        }
+        
+        // 页面加载完成后渲染
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化三个视频播放器
+            setupVideoPlayer('normalAppsVideo', 'normalAppsVideoWrapper', 'normalAppsPlayPauseBtn', 'normalAppsMuteBtn', 'normalAppsFullscreenBtn');
+            setupVideoPlayer('quickCreateVideo', 'quickCreateVideoWrapper', 'quickCreatePlayPauseBtn', 'quickCreateMuteBtn', 'quickCreateFullscreenBtn');
+            setupVideoPlayer('modelCreateVideo', 'modelCreateVideoWrapper', 'modelCreatePlayPauseBtn', 'modelCreateMuteBtn', 'modelCreateFullscreenBtn');
+            
+            // 渲染模型卡片和设置轮播
+            renderModels();
+            setupCarousel();
+            
+            // 全局监听全屏退出事件，确保退出全屏后重新渲染
+            if (!fullscreenExitHandler) {
+                fullscreenExitHandler = handleFullscreenExit;
+                document.addEventListener('fullscreenchange', fullscreenExitHandler);
+                document.addEventListener('webkitfullscreenchange', fullscreenExitHandler);
+                document.addEventListener('msfullscreenchange', fullscreenExitHandler);
+            }
+            
+            // 监听窗口大小变化（开发者工具打开/关闭时可能触发）
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                // 防抖处理，避免频繁触发
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                    // 检查模型卡片是否还存在
+                    const allCards = document.querySelectorAll('.content-section .model-card');
+                    if (allCards.length === 0) {
+                        console.log('检测到窗口大小变化，模型卡片消失，重新渲染...');
+                        // 重新渲染模型卡片
+                        if (typeof renderModels === 'function') {
+                            renderModels();
+                        }
+                        if (typeof setupCarousel === 'function') {
+                            setupCarousel();
+                        }
+                    }
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
+
